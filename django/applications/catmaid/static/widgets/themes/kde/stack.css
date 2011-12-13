@@ -150,6 +150,23 @@ div.TilelayerControl .layerControl
 	margin:0 0 10px 0;
 }
 
+div.IntensityLayer
+{
+    margin:0px;
+    padding:0px;
+    position:relative;
+    top:10px;
+    left:10px;
+    width:150px;
+    color:#FFFFFF;
+}
+
+div.IntensityLayer div.IntensityBox
+{
+    position:relative;
+    margin-top:30px;
+}
+
 div.sliceView div.sliceMouseCatcher
 {
 	position:absolute;
