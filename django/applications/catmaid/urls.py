@@ -9,6 +9,8 @@ num = r'[-+]?[0-9]*\.?[0-9]+'
 integer = r'[-+]?[0-9]+'
 # A regular expression matching lists of integers with comma as delimiter
 intlist = r'[0-9]+(,[0-9]+)*'
+# Matches a lists of integers or floating point numbers with comma as delimiter
+numlist = r'%s(,%s)*' % (num, num)
 
 # Add the main index.html page at the root:
 urlpatterns = patterns('',
@@ -350,6 +352,11 @@ urlpatterns += patterns('catmaid.control.clustering',
 # Thumbnailing
 urlpatterns += patterns('catmaid.control.thumbnail',
     (r'^(?P<project_id>\d+)/stack/(?P<stack_ids>%s)/thumbnail/(?P<x_min>%s),(?P<x_max>%s)/(?P<y_min>%s),(?P<y_max>%s)/(?P<z_min>%s),(?P<z_max>%s)/(?P<zoom_level>\d+)/$' % (intlist, num, num, num, num, num, num), 'make_thumbnail' ),
+)
+
+# Tile processing
+urlpatterns += patterns('catmaid.control.image_processing',
+    (r'^(?P<project_id>\d+)/stack/(?P<stack_ids>%s)/combine_tiles/(?P<section>\d+)/(?P<x>\d+)/(?P<y>\d+)/(?P<zoom_level>\d+)/(?P<intensities>%s)/$' % (intlist, numlist), 'create_tile')
 )
 
 # Collection of various parts of the CATMAID API. These methods are usually

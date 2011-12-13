@@ -631,7 +631,7 @@ var ClassificationEditor = new function()
                             project.setTool( new Navigator() );
                         }
                     };
-                    openProjectStack( roi.project_id, roi.stack_id, callback);
+                    openProjectStack( roi.project_id, roi.stack_id, false, callback);
                 }));
     };
 
