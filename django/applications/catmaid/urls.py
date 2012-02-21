@@ -346,6 +346,11 @@ urlpatterns += patterns('catmaid.control.clustering',
         name="clustering_display"),
 )
 
+# Thumbnailing
+urlpatterns += patterns('catmaid.control.thumbnail',
+    (r'^(?P<project_id>\d+)/stack/(?P<stack_id>\d+)/thumbnail/(?P<x_min>%s),(?P<x_max>%s)/(?P<y_min>%s),(?P<y_max>%s)/(?P<z_min>%s),(?P<z_max>%s)/(?P<zoom_level>\d+)/(?P<tissue>.*)/(?P<metadata>.*)/$' % (num, num, num, num, num, num), 'make_thumbnail' )
+)
+
 # Collection of various parts of the CATMAID API. These methods are usually
 # one- or two-liners and having them in a separate statement would not improve
 # readability. Therefore, they are all declared in this general statement.
