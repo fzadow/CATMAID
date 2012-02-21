@@ -117,6 +117,7 @@ CELERY_IMPORTS = (
     'catmaid.control.cropping',
     'catmaid.control.roi',
     'catmaid.control.treenodeexport',
+    'catmaid.control.thumbnail',
 )
 
 # A couple of functions useful for generating default directories to
