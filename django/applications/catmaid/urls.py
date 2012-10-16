@@ -356,7 +356,8 @@ urlpatterns += patterns('catmaid.control.thumbnail',
 
 # Tile processing
 urlpatterns += patterns('catmaid.control.image_processing',
-    (r'^(?P<project_id>\d+)/stack/(?P<stack_ids>%s)/combine_tiles/(?P<section>\d+)/(?P<x>\d+)/(?P<y>\d+)/(?P<zoom_level>\d+)/(?P<intensities>%s)/$' % (intlist, numlist), 'create_tile')
+    (r'^(?P<project_id>\d+)/stack/(?P<stack_ids>%s)/combine_tiles/(?P<section>\d+)/(?P<x>\d+)/(?P<y>\d+)/(?P<zoom_level>\d+)/(?P<intensities>%s)/$' % (intlist, numlist), 'create_tile'),
+    (r'^(?P<project_id>\d+)/stack/(?P<stack_ids>%s)/combine_tiles/(?P<section>\d+)/(?P<x>\d+)/(?P<y>\d+)/(?P<zoom_level>\d+)/(?P<thresholds>%s)/(?P<intensities>%s)/$' % (intlist, intlist, numlist), 'create_tile' ),
 )
 
 # Collection of various parts of the CATMAID API. These methods are usually

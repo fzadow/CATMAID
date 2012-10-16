@@ -20,3 +20,5 @@ pillow==2.3.0
 south==0.8.4
 scipy==0.11.0
 mock==1.0.1
+gevent==0.13.8
+django-socketio==0.3.5
