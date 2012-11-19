@@ -189,6 +189,7 @@ div#data_view td.even-stackimage
 div#data_view td.stackname, div#data_view td.odd-stackname, div#data_view td.even-stackname
 {
 	vertical-align: top;
+	max-width: 250px;
 	text-align: left;
 }
 
@@ -493,4 +494,11 @@ div#classification_graph_object img.roiimage {
 
 .right {
   float: right;
+}
+
+div#data_view a.adjustable-composite
+{
+	color: #000000;
+	opacity: 0.4;
+	text-decoration: none;
 }
