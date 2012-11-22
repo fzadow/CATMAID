@@ -699,7 +699,15 @@ function handle_openProjectStack( status, text, xml, adjustable_stack )
 							}
 						);
 					});
-
+					// add a link to open an adjustable composite
+					stack_menu_content.push(
+						{
+							id : stacks[0].id,
+							title : "Adjustable Composite",
+							note : "",
+							action : "javascript:openProjectStack(" + project.id + "," + stacks[0].id + ", true)"
+						}
+					);
 					stack_menu.update( stack_menu_content );
 					document.getElementById( "stackmenu_box" ).style.display = "block";
 				}
