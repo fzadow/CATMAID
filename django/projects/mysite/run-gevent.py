@@ -5,6 +5,9 @@ from gevent import monkey
 monkey.patch_all()
 
 # Import the rest
+from psycogreen import gevent
+gevent.patch_psycopg()
+
 from django.core.handlers.wsgi import WSGIHandler as DjangoWSGIApp
 from django.core.management import setup_environ
 from gevent.wsgi import WSGIServer
