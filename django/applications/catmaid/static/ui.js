@@ -228,6 +228,14 @@ UI = function()
 	}
 	
 	/**
+	 * return true if left mouse button is currently pressed
+	 */
+	this.getLeftMouseDown = function( e )
+	{
+	    return leftMouseDown;
+	}
+	
+	/**
 	 * get the key code
 	 */
 	this.getKey = function( e )
