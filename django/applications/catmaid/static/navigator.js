@@ -87,6 +87,12 @@ function Navigator()
 		self.mouseCatcher = mc;
 	}
 	
+	/* updates the URL in the browser's address bar  */
+	this.updateUrl = function()
+	{
+		window.history.replaceState( '', "", project.createURL() );
+	}
+	
 	this.updateControls = function()
 	{
 		self.slider_s.setByValue( self.stack.s, true );
@@ -94,6 +100,12 @@ function Navigator()
 
 		self.input_x.value = self.stack.x;
 		self.input_y.value = self.stack.y;
+		
+		// update URL only if left mouse button is not down
+		// (this prevents constant updates while moving the stack)
+		if( !ui.getLeftMouseDown() ) {
+			self.updateUrl();
+		}
 		
 		return;
 	}
@@ -127,6 +139,9 @@ function Navigator()
 		ui.releaseEvents(); 
 		ui.removeEvent( "onmousemove", onmousemove );
 		ui.removeEvent( "onmouseup", onmouseup );
+		
+		self.updateUrl();
+		
 		return false;
 	};
 	
