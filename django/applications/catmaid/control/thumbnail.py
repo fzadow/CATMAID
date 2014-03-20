@@ -47,7 +47,10 @@ class ThumbnailingJob( cropping.CropJob ):
         file_name = cropping.id_generator()
         output_path = os.path.join( output_folder, file_name )
         # Call the super constructor
-        cropping.CropJob.__init__( self, user, project_id, stack_ids, x_min, x_max, y_min, y_max, z_min, z_max, zoom_level, output_path )
+        rotation = 0
+        cropping.CropJob.__init__(self, user, project_id, stack_ids, x_min,
+                x_max, y_min, y_max, z_min, z_max, rotation, zoom_level, False,
+                output_path)
         self.folder = folder
         self.metadata = metadata
         self.markers = markers
@@ -136,10 +139,7 @@ def start_asynch_process( job ):
     result = create_thumbnails.delay( job )
 
     # Create closing response
-    closingResponse = HttpResponse(json.dumps(""), mimetype="text/json")
-    closingResponse['Connection'] = 'close'
-
-    return closingResponse
+    return HttpResponse(json.dumps({'message': 'success'}), mimetype="text/json")
 
 @login_required
 def make_thumbnail(request, project_id=None, stack_ids=None, x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None, zoom_level=None):
@@ -148,9 +148,7 @@ def make_thumbnail(request, project_id=None, stack_ids=None, x_min=None, x_max=N
     """
     # Make sure we got a POST request
     if request.method != 'POST':
-            err_response = json_error_response( "Expected a POST request to get all the details of the job.")
-            err_response['Connection'] = 'close'
-            return err_response
+            return json_error_response( "Expected a POST request to get all the details of the job.")
 
     # Get meta data information
     metadata = None
@@ -197,10 +195,7 @@ def make_thumbnail(request, project_id=None, stack_ids=None, x_min=None, x_max=N
                 err_message += str( n+1 ) + ". " + e
             else:
                 err_message += ", " + str( n+1 ) + ". " + e
-        err_response = json_error_response( err_message )
-        err_response['Connection'] = 'close'
-        return err_response
+        return json_error_response( err_message )
 
-    result = start_asynch_process( job )
-    return result
+    return start_asynch_process( job )
 
