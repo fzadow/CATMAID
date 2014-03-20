@@ -29,54 +29,80 @@ function DBThumbnailTool()
         // the project URL refers also to the tool, make sure we got the navigator in there
         var projURL = project.createURL();
         projURL = projURL.replace( "tool=dbthumbnailtool", "tool=navigator" );
-        // create a list of all stacks and their URL in the project
-        var stacks = projects_available[project.id];
-        var stack_ids = "";
-        var stack_metadata = "";
-        var nStacks = 0;
-        for ( var s in stacks )
-        {
-            if ( nStacks > 0 )
-            {
-                stack_ids += ","
-                stack_metadata += ","
-            }
-            stack_ids += s.toString()
-            stack_metadata += projURL.replace( "sid0=" + stack.getId(), "sid0=" + s );
-            nStacks++;
-        }
-        var cb = self.getCropBox();
-        var zoom_level = stack.s;
-        var z = stack.z * stack.resolution.z + stack.translation.z;
-        var tissue = self.selected_tissue.folder;
         // also, the hostname needs to be prepended
-        projURL = "http://" + document.location.hostname + "/" + catmaid_url + projURL;
+        projURL = "http://" + document.location.hostname + django_url + projURL;
 
-        // create marker data
-        var marker_data = "";
-        var nMarkers = 0;
-        for ( var m in self.markers )
-        {
-            if ( nMarkers > 0 )
-            {
-                marker_data += ",";
+        /**
+         * Requests the creation of a thumbnail, based on the response of a
+         * request returning information about all stacks of the current
+         * project.
+         */
+        var requestThumbnail = function(status, text) {
+            if (200 !== status) {
+                new ErrorDialog("Couldn't create thumbnail due to an error!",
+                        "The server returned an unexpected status code: " +
+                                status).show();
+                return;
             }
-            var mrk = self.markers[ m ];
-            var data = mrk.pos_x_world + "," + mrk.pos_y_world + "," + mrk.symbol + "," + mrk.color + "," + mrk.size;
-            marker_data += Base64.encode( data );
-            nMarkers++;
-        }
 
-        var url = django_url + project.id + '/stack/' + stack_ids + '/thumbnail/' + cb.left + "," + cb.right + "/" + cb.top + "," + cb.bottom + "/" + z + "," + z + '/' + zoom_level + '/';
+            var json = $.parseJSON(text);
+            if (json.error)
+            {
+                new ErrorDialog("Couldn't create thumbnail due to an error!",
+                        json.error).show();
+                return;
+            }
 
-        var post_data =
-        {
-            tissue : tissue,
-            metadata : stack_metadata,
-            markers : marker_data
-        }
+            // Get lists with stack IDs and their URLs
+            var stacks = json;
+            var stack_data = stacks.reduce(function(o, s) {
+                o.stack_ids.push(s.id);
+                o.stack_metadata.push(projURL.replace("sid0=" + stack.getId(),
+                        "sid0=" + s.id));
+                return o;
+            }, {
+                stack_ids: [],
+                stack_metadata: []
+            });
 
-        requestQueue.register(url, 'POST', post_data, handle_thumbnailing );
+            var cb = self.getCropBox();
+            var zoom_level = stack.s;
+            var z = stack.z * stack.resolution.z + stack.translation.z;
+            var tissue = self.selected_tissue.folder;
+
+            // create marker data
+            var marker_data = "";
+            var nMarkers = 0;
+            for ( var m in self.markers )
+            {
+                if ( nMarkers > 0 )
+                {
+                    marker_data += ",";
+                }
+                var mrk = self.markers[ m ];
+                var data = mrk.pos_x_world + "," + mrk.pos_y_world + "," + mrk.symbol + "," + mrk.color + "," + mrk.size;
+                marker_data += Base64.encode( data );
+                nMarkers++;
+            }
+
+            var url = django_url + project.id + '/stack/' +
+                    stack_data.stack_ids.join() + '/thumbnail/' + cb.left +
+                    "," + cb.right + "/" + cb.top + "," + cb.bottom + "/" +
+                    z + "," + z + '/' + zoom_level + '/';
+
+            var post_data =
+            {
+                tissue : tissue,
+                metadata : stack_data.stack_metadata.join(),
+                markers : marker_data
+            }
+
+            requestQueue.register(url, 'POST', post_data, handle_thumbnailing );
+        };
+
+        // create a list of all stacks and their URL in the project
+        requestQueue.register(django_url + project.id + '/stacks', 'POST', null,
+            requestThumbnail);
         return false;
     };
 
@@ -88,7 +114,8 @@ function DBThumbnailTool()
 
             if (e.error)
             {
-                alert( e.error )
+                new ErrorDialog("An error occured while creating the thumbnail",
+                        e.error).show();
             }
             else
             {
