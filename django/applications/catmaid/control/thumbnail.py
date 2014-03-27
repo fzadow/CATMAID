@@ -129,6 +129,15 @@ def create_thumbnails( job ):
         msg.text = "The requested thumbnail could not be created due to an error while saving the result (" + error_message + ")."
         msg.action = ""
         msg.save()
+    else:
+        proj = Project.objects.get(pk=int(job.project_id))
+        msg = Message()
+        msg.user = User.objects.get(pk=int(job.user.id))
+        msg.read = False
+        msg.title = "Thumbnail created for " + proj.title + "."
+        msg.text = ""
+        msg.action = ""
+        msg.save()
 
     return "Created thumnail(s)"
 
