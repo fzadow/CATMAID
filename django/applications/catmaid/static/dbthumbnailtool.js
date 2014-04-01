@@ -57,11 +57,13 @@ function DBThumbnailTool()
             var stacks = json;
             var stack_data = stacks.reduce(function(o, s) {
                 o.stack_ids.push(s.id);
+                o.stack_titles.push(s.title);
                 o.stack_metadata.push(projURL.replace("sid0=" + stack.getId(),
                         "sid0=" + s.id));
                 return o;
             }, {
                 stack_ids: [],
+                stack_titles: [],
                 stack_metadata: []
             });
 
@@ -85,15 +87,33 @@ function DBThumbnailTool()
                 nMarkers++;
             }
 
+            // find Composite stack by name
+            var composite_index = stack_data.stack_titles.indexOf("Composite");
+            if ( composite_index == -1 )
+            {
+                new ErrorDialog("Could not find a stack named 'Composite'.").show();
+                return;
+            }
+            // find GFP channel stack by name, it's "Channel 2" by definition
+            // and add it to query string
+            var gfp_index = stack_data.stack_titles.indexOf("Channel 2");
+            if ( gfp_index != -1 )
+            {
+                stack_data.stack_metadata[composite_index] +=
+                        "&sid1=" + stack_data.stack_ids[gfp_index] +
+                        "&s1=" + zoom_level;
+            }
+
+            // Only request Composite stack
             var url = django_url + project.id + '/stack/' +
-                    stack_data.stack_ids.join() + '/thumbnail/' + cb.left +
+                    stack_data.stack_ids[composite_index] + '/thumbnail/' + cb.left +
                     "," + cb.right + "/" + cb.top + "," + cb.bottom + "/" +
                     z + "," + z + '/' + zoom_level + '/';
 
             var post_data =
             {
                 tissue : tissue,
-                metadata : stack_data.stack_metadata.join(),
+                metadata : stack_data.stack_metadata[composite_index],
                 markers : marker_data
             }
 
