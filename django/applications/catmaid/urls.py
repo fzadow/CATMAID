@@ -351,7 +351,7 @@ urlpatterns += patterns('catmaid.control.clustering',
 
 # Thumbnailing
 urlpatterns += patterns('catmaid.control.thumbnail',
-    (r'^(?P<project_id>\d+)/stack/(?P<stack_ids>%s)/thumbnail/(?P<x_min>%s),(?P<x_max>%s)/(?P<y_min>%s),(?P<y_max>%s)/(?P<z_min>%s),(?P<z_max>%s)/(?P<zoom_level>\d+)/$' % (intlist, num, num, num, num, num, num), 'make_thumbnail' ),
+    (r'^(?P<project_id>\d+)/stack/(?P<stack_ids>%s)/thumbnail/(?P<x_min>%s),(?P<x_max>%s)/(?P<y_min>%s),(?P<y_max>%s)/(?P<z_min>%s),(?P<z_max>%s)/(?P<zoom_level>-?\d+)/$' % (intlist, num, num, num, num, num, num), 'make_thumbnail' ),
 )
 
 # Tile processing
