@@ -67,7 +67,7 @@ function ProcTileLayer(
     };
 
     // call super constructor and add self as tile source
-    TileLayer.call(this, stack, tileWidth, tileHeight, this);
+    TileLayer.call(this, "TileLayer", stack, tileWidth, tileHeight, this);
 
     // initialization
 
