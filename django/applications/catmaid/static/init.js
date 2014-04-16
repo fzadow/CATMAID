@@ -26,6 +26,8 @@ var ui;
 var requestQueue;
 var project;
 var project_view;
+var projects_available;
+var projects_available_ready = false;
 
 var current_dataview;
 var dataview_menu;
@@ -367,10 +369,42 @@ function updateProjectListFromCacheDelayed()
   }
   cacheLoadingTimeout = window.setTimeout(
     function() {
+      recreateProjectStructureFromCache();
       updateProjectListFromCache();
       // indicate finish of filtered loading of the projects
       indicator.className = "";
     }, 500);
+}
+
+/**
+ * A structure of the available projects and their stacks is
+ * maintained. This method recreates this structure, based on
+ * the cached content.
+ */
+function recreateProjectStructureFromCache() {
+  // clear project data structure
+  projects_available_ready = false;
+  if (projects_available)
+  {
+    delete projects_available;
+  }
+  projects_available = new Array();
+  // recreate it
+  for (i in cachedProjectsInfo) {
+    p = cachedProjectsInfo[i];
+    // add project
+    projects_available[p.pid] = new Array();
+    // add linked stacks
+    for (j in p.action) {
+      projects_available[p.pid].push(
+          { id : j,
+            title : p.action[j].title,
+            action : p.action[j].action,
+            note : p.action[j].comment}
+      );
+    }
+  }
+  projects_available_ready = true;
 }
 
 /**
