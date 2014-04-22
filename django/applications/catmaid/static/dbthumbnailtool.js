@@ -380,11 +380,13 @@ function DBThumbnailTool()
         var tissues = new Array(
             { name : "Salivary Gland", folder : "salivary_gland" } ,
             { name : "CNS", folder : "cns" },
-            { name : "Wing Disc", folder : "wing_disc" },
+            { name : "Wing Disc (early)", folder : "wing_disc_early" },
+            { name : "Wing Disc (late)", folder : "wing_disc_late" },
             { name : "Fat Body", folder : "fat_body" },
-            { name : "Ovary", folder : "ovary" },
-            { name : "Testis", folder : "testis" },
-            { name : "Gut", folder : "gut" } );
+            { name : "Ovary (germarium)", folder : "ovary_germarium" },
+            { name : "Ovary (2-8)", folder : "ovary_2_8" },
+            { name : "Ovary (9)", folder : "ovary_9" },
+            { name : "Testis", folder : "testis" } );
         // take tha first tissue as default
         self.selected_tissue = tissues[0];
         self.updateSelectedTissue();
