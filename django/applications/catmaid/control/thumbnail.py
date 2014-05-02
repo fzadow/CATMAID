@@ -41,19 +41,21 @@ class ThumbnailingJob( cropping.CropJob ):
     """ A small container class to keep information about the thumbnailing
     job to be done.
     """
-    def __init__(self, user, project_id, stack_ids, x_min, x_max, y_min, y_max, z_min, z_max, zoom_level, folder, metadata, markers):
+    def __init__(self, user, project_id, stack_ids, x_min, x_max, y_min, y_max, z_min, z_max, zoom_level, folder, metadata, markers, separate):
         # Build output path -- *without* extension
         output_folder = os.path.join( settings.THUMBNAIL_DIR, folder)
         file_name = cropping.id_generator()
         output_path = os.path.join( output_folder, file_name )
-        # Call the super constructor
+        # Call the super constructor:
         rotation = 0
         cropping.CropJob.__init__(self, user, project_id, stack_ids, x_min,
                 x_max, y_min, y_max, z_min, z_max, rotation, zoom_level, False,
                 output_path)
+        self.file_name = file_name
         self.folder = folder
         self.metadata = metadata
         self.markers = markers
+        self.separate = separate
 
 def add_markers_to_image( job, img ):
     """ Adds the markers of the job to the image.
@@ -104,13 +106,28 @@ def create_thumbnails( job ):
             name_ext = s.title.lower().replace(" ", "_")
             # Write out the output image
             if len( cropped_stack ) > 0:
-                # Add file extension
-                op = "{0}-{1}.{2}".format( job.output_path, name_ext, cropping.file_extension)
-                outputImage.writeImages( op )
-                #write a metadata file (output path + ".txt")
-                mdFile = open(op + ".txt", "w")
-                mdFile.write( job.metadata[ n ] )
-                mdFile.close()
+                # write composite image and metadata file to tissue folder
+                if name_ext == "composite":
+                    output_path = os.path.join( settings.THUMBNAIL_DIR, job.folder, job.file_name )
+                    op = "{0}-{1}.{2}".format( output_path, name_ext, cropping.file_extension)
+                    outputImage.writeImages( op )
+                    #write a metadata file (output path + ".txt")
+                    mdFile = open(op + ".txt", "w")
+                    mdFile.write( job.metadata[ n ] )
+                    mdFile.close()
+                # write channel images to 'SEPARATE' folder
+                if job.separate:
+                    projectName = Project.objects.get( id=job.project_id ).title
+                    separate_folder = os.path.join( settings.THUMBNAIL_DIR, 'SEPARATE' )
+                    if name_ext == "composite":
+                       infoFileName = os.path.join( separate_folder, "{0}-{1}.{2}".format( projectName.replace( " ", "_" ), job.file_name, 'info.txt' ) )
+                       infoFile = open( infoFileName, "w")
+                       infoFile.write( projectName + "\n" )
+                       infoFile.write( job.metadata[ n ] )
+                       infoFile.close()
+                    op = os.path.join( separate_folder, "{0}-{1}-{2}.{3}".format( projectName.replace( " ", "_" ), job.file_name, name_ext, cropping.file_extension ) )
+                    outputImage.writeImages( op )
+
             else:
                 error_occured = True
                 error_message = "A region outside the stack has been selected. Therefore, no image was produced."
@@ -159,6 +176,13 @@ def make_thumbnail(request, project_id=None, stack_ids=None, x_min=None, x_max=N
     if request.method != 'POST':
             return json_error_response( "Expected a POST request to get all the details of the job.")
 
+    # export separate channels?
+    separate = None
+    try:
+        separate = request.REQUEST["separate"] in ['true', 'True', '1']
+    except:
+        separate = False
+
     # Get meta data information
     metadata = None
     try:
@@ -193,7 +217,7 @@ def make_thumbnail(request, project_id=None, stack_ids=None, x_min=None, x_max=N
     stack_ids = [int( x ) for x in string_list]
 
     # Crate a new cropping job
-    job = ThumbnailingJob(request.user, project_id, stack_ids, x_min, x_max, y_min, y_max, z_min, z_max, zoom_level, tissue, metadata, markers)
+    job = ThumbnailingJob(request.user, project_id, stack_ids, x_min, x_max, y_min, y_max, z_min, z_max, zoom_level, tissue, metadata, markers, separate)
 
     # Parameter check
     errors = sanity_check( job )

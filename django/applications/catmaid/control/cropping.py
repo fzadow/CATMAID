@@ -632,7 +632,7 @@ def sanity_check( job ):
     # Make sure the output path can be written to
     output_dir = os.path.dirname( job.output_path )
     if not os.path.exists( output_dir ) or not os.access( output_dir, os.W_OK ):
-        errors.append( "the output folder is not accessible" )
+        errors.append( "the output folder (%s) is not accessible" % output_dir )
     # Test the cropping parameters
     if job.x_min > job.x_max:
         errors.append( "x_min must no be larger than x_max" )

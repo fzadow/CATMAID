@@ -104,17 +104,36 @@ function DBThumbnailTool()
                         "&s1=" + zoom_level;
             }
 
-            // Only request Composite stack
-            var url = django_url + project.id + '/stack/' +
-                    stack_data.stack_ids[composite_index] + '/thumbnail/' + cb.left +
-                    "," + cb.right + "/" + cb.top + "," + cb.bottom + "/" +
-                    z + "," + z + '/' + zoom_level + '/';
-
-            var post_data =
+            if( export_channels_checkbox.checked )
             {
-                tissue : tissue,
-                metadata : stack_data.stack_metadata[composite_index],
-                markers : marker_data
+                var url = django_url + project.id + '/stack/' +
+                        stack_data.stack_ids.join() + '/thumbnail/' + cb.left +
+                        "," + cb.right + "/" + cb.top + "," + cb.bottom + "/" +
+                        z + "," + z + '/' + zoom_level + '/';
+
+                var post_data =
+                {
+                    separate : true,
+                    tissue : tissue,
+                    metadata : stack_data.stack_metadata.join(),
+                    markers : marker_data
+                }
+            }
+            else
+            {
+                // Only request Composite stack
+                var url = django_url + project.id + '/stack/' +
+                        stack_data.stack_ids[composite_index] + '/thumbnail/' + cb.left +
+                        "," + cb.right + "/" + cb.top + "," + cb.bottom + "/" +
+                        z + "," + z + '/' + zoom_level + '/';
+
+                var post_data =
+                {
+                    separate : false,
+                    tissue : tissue,
+                    metadata : stack_data.stack_metadata[composite_index],
+                    markers : marker_data
+                }
             }
 
             requestQueue.register(url, 'POST', post_data, handle_thumbnailing );
