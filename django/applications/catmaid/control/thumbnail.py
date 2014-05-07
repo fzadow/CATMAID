@@ -115,10 +115,10 @@ def create_thumbnails( job ):
                     mdFile = open(op + ".txt", "w")
                     mdFile.write( job.metadata[ n ] )
                     mdFile.close()
-                # write channel images to 'SEPARATE' folder
+                # write channel images to special folder for Marko... 
                 if job.separate:
                     projectName = Project.objects.get( id=job.project_id ).title
-                    separate_folder = os.path.join( settings.THUMBNAIL_DIR, 'SEPARATE' )
+                    separate_folder = os.path.join( '/mnt/rablibrary@fileserver/RAB library/Marko 2014/channels' )
                     if name_ext == "composite":
                        infoFileName = os.path.join( separate_folder, "{0}-{1}.{2}".format( projectName.replace( " ", "_" ), job.file_name, 'info.txt' ) )
                        infoFile = open( infoFileName, "w")
