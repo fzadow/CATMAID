@@ -9,6 +9,7 @@ var SelectionTable = function() {
 
   this.skeletons = [];
   this.skeleton_ids = {}; // skeleton_id vs index in skeleton array
+  this.reviews = {};  // skeleton_id vs review percentage
   this.all_visible = true;
   this.all_synapses_visible = {pre: true, post: true};
   this.selected_skeleton_id = null;
@@ -19,6 +20,7 @@ var SelectionTable = function() {
 SelectionTable.prototype = {};
 $.extend(SelectionTable.prototype, new InstanceRegistry());
 $.extend(SelectionTable.prototype, new SkeletonSource());
+$.extend(SelectionTable.prototype, new Colorizer());
 
 SelectionTable.prototype.highlighting_color = "#d6ffb5";
 
@@ -62,6 +64,7 @@ SelectionTable.prototype.SkeletonModel = function( id, neuronname, color ) {
     this.post_visible = true;
     this.text_visible = false;
     this.color = color;
+    this.opacity = 1; // from 0 to 1
 };
 
 SelectionTable.prototype.SkeletonModel.prototype = {};
@@ -79,6 +82,7 @@ SelectionTable.prototype.SkeletonModel.prototype.clone = function() {
   m.pre_visible = this.pre_visible;
   m.post_visible = this.post_visible;
   m.text_visible = this.text_visible;
+  m.opacity = this.opacity;
   return m;
 };
 
@@ -151,48 +155,6 @@ SelectionTable.prototype.SkeletonModel.prototype.skeleton_info = function() {
           }
         }
       });
-};
-
-
-SelectionTable.prototype.COLORS = [[1, 1, 0], // yellow
-                                   [1, 0, 1], // magenta
-                                   [0.5, 0.5, 1], // light blue
-                                   [1, 0, 0], // red
-                                   [1, 1, 1], // white
-                                   [0, 1, 0], // green
-                                   [0, 1, 1], // cyan
-                                   [1, 0.5, 0], // orange
-                                   [0, 0, 1], // blue
-                                   [0.75, 0.75, 0.75], // silver
-                                   [1, 0.5, 0.5], // pinkish
-                                   [0.5, 1, 0.5], // light cyan
-                                   [0.5, 1, 0], // light green
-                                   [0, 1, 0.5], // pale green
-                                   [1, 0, 0.5], // purplish
-                                   [0.5, 0, 0], // maroon
-                                   [0.5, 0.5, 0.5], // grey
-                                   [0.5, 0, 0.5], // purple
-                                   [0, 0, 0.5], // navy blue
-                                   [1, 0.38, 0.28], // tomato
-                                   [0.85, 0.64, 0.12], // gold
-                                   [0.25, 0.88, 0.82], // turquoise
-                                   [1, 0.75, 0.79]]; // pink
-
-
-SelectionTable.prototype.pickColor = function() {
-  var c = this.COLORS[this.next_color_index % this.COLORS.length];
-  var color = new THREE.Color().setRGB(c[0], c[1], c[2]);
-  if (this.next_color_index < this.COLORS.length) {
-    this.next_color_index += 1;
-    return color;
-  }
-  // Else, play a variation on the color's hue (+/- 0.25) and saturation (from 0.5 to 1)
-  var hsl = color.getHSL();
-  color.setHSL((hsl.h + (Math.random() - 0.5) / 2.0) % 1.0,
-               Math.max(0.5, Math.min(1.0, (hsl.s + (Math.random() - 0.5) * 0.3))),
-               hsl.l);
-  this.next_color_index += 1;
-  return color;
 };
 
 SelectionTable.prototype.highlight = function( skeleton_id ) {
@@ -375,19 +337,34 @@ SelectionTable.prototype.append = function(models) {
     growlAlert("Info", "No skeletons selected!"); // at source
     return;
   }
-  skeleton_ids.forEach(function(skeleton_id) {
-    if (skeleton_id in this.skeleton_ids) {
-      // Update skeleton
-      this.skeletons[this.skeleton_ids[skeleton_id]] = models[skeleton_id];
-      return;
-    }
-    this.skeletons.push(models[skeleton_id]);
-    this.skeleton_ids[skeleton_id] = this.skeletons.length -1;
-  }, this);
 
-  this.gui.update();
+  // Retrieve review status before doing anything else
+  requestQueue.register(django_url + project.id + '/skeleton/review-status', 'POST',
+    {skeleton_ids: skeleton_ids},
+    (function(status, text) {
+      if (200 !== status) return;
+      var json = $.parseJSON(text);
+      if (json.error) {
+        new ErrorDialog(json.error, json.detail).show();
+        return;
+      }
 
-  this.updateLink(models);
+      skeleton_ids.forEach(function(skeleton_id) {
+        if (skeleton_id in this.skeleton_ids) {
+          // Update skeleton
+          this.skeletons[this.skeleton_ids[skeleton_id]] = models[skeleton_id];
+          return;
+        }
+        this.skeletons.push(models[skeleton_id]);
+        this.reviews[skeleton_id] = parseInt(json[skeleton_id]);
+        this.skeleton_ids[skeleton_id] = this.skeletons.length -1;
+      }, this);
+
+
+      this.gui.update();
+
+      this.updateLink(models);
+    }).bind(this));
 };
 
 /** ids: an array of Skeleton IDs. */
@@ -432,6 +409,7 @@ SelectionTable.prototype.removeSkeletons = function(ids) {
 SelectionTable.prototype.clear = function(source_chain) {
   this.skeletons = [];
   this.skeleton_ids = {};
+  this.reviews = {};
   this.gui.clear();
   this.selected_skeleton_id = null;
   this.next_color_index = 0;
@@ -659,6 +637,12 @@ SelectionTable.prototype.GUI.prototype.append = function (skeleton) {
   rowElement.append(
     $(document.createElement("td")).text( skeleton.baseName + ' #' + skeleton.id )
   );
+
+  // percent reviewed
+  rowElement.append($('<td/>')
+      .text(this.table.reviews[skeleton.id] + "%")
+      .css('background-color',
+          ReviewSystem.getBackgroundColor(this.table.reviews[skeleton.id])));
 
   // show skeleton
   rowElement.append(

@@ -502,3 +502,38 @@ div#data_view a.adjustable-composite
 	opacity: 0.4;
 	text-decoration: none;
 }
+#review_segment_table tr.highlight {
+	font-weight:bold;
+}
+
+#review_segment_table th {
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-bottom: 1px solid black;
+}
+
+#settings_widget .title {
+  font-weight: bold;
+}
+
+#settings_widget .content {
+  margin-left: 3em;
+}
+
+.setting {
+  float: left;
+  clear: left;
+  padding: 0.1em 0 0.1em 0;
+}
+
+.setting .description {
+  width: 15em;
+  display: inline-block
+}
+
+.setting input[type=checkbox] {
+  position: relative;
+  margin-left: 0;
+  margin-bottom: 0;
+  bottom: -0.2em;
+}

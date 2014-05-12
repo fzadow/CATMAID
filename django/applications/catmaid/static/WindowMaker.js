@@ -304,6 +304,7 @@ var WindowMaker = new function()
           '<tr>' +
             '<th width="60px">action</th>' +
             '<th>name</th>' +
+            '<th>% reviewed</th>' +
             '<th>selected</th>' +
             '<th>pre</th>' +
             '<th>post</th>' +
@@ -315,6 +316,7 @@ var WindowMaker = new function()
           '<tr>' +
             '<td><img src="' + STATIC_URL_JS + 'widgets/themes/kde/delete.png" id="selection-table-remove-all' + ST.widgetID + '" title="Remove all"></td>' +
             '<td><input type="button" id="selection-table-sort-by-name' + ST.widgetID + '" value="Sort by name" /></td>' +
+            '<td></td>' +
             '<td><input type="checkbox" id="selection-table-show-all' + ST.widgetID + '" checked /></td>' +
             '<td><input type="checkbox" id="selection-table-show-all-pre' + ST.widgetID + '" checked /></td>' +
             '<td><input type="checkbox" id="selection-table-show-all-post' + ST.widgetID + '" checked /></td>' +
@@ -502,6 +504,7 @@ var WindowMaker = new function()
     shadingMenu.setAttribute("id", "skeletons_shading" + WA.widgetID);
     $('<option/>', {value : 'none', text: 'None', selected: true}).appendTo(shadingMenu);
     $('<option/>', {value : 'active_node_split', text: 'Active node split'}).appendTo(shadingMenu);
+    $('<option/>', {value : 'downstream_amount', text: 'Downstream cable'}).appendTo(shadingMenu);
     $('<option/>', {value : 'betweenness_centrality', text: 'Betweenness centrality'}).appendTo(shadingMenu);
     $('<option/>', {value : 'slab_centrality', text: 'Slab centrality'}).appendTo(shadingMenu);
     $('<option/>', {value : 'distance_to_root', text: 'Distance to root'}).appendTo(shadingMenu);
@@ -513,7 +516,8 @@ var WindowMaker = new function()
     var colorMenu = document.createElement('select');
     $('<option/>', {value : 'none', text: 'Source', selected: true}).appendTo(colorMenu);
     $('<option/>', {value : 'creator', text: 'By Creator'}).appendTo(colorMenu);
-    $('<option/>', {value : 'reviewer', text: 'By Reviewer'}).appendTo(colorMenu);
+    $('<option/>', {value : 'all-reviewed', text: 'All Reviewed'}).appendTo(colorMenu);
+    $('<option/>', {value : 'own-reviewed', text: 'Own Reviewed'}).appendTo(colorMenu);
     colorMenu.onchange = WA.updateSkeletonColors.bind(WA, colorMenu);
     buttons.appendChild(colorMenu);
 
@@ -521,6 +525,7 @@ var WindowMaker = new function()
     var synColors = document.createElement('select');
     synColors.options.add(new Option('Type: pre/red, post/cyan', 'cyan-red'));
     synColors.options.add(new Option('N with partner: pre[red > blue], post[yellow > cyan]', 'by-amount'));
+    synColors.options.add(new Option('Synapse clusters', 'synapse-clustering'));
     synColors.onchange = WA.updateConnectorColors.bind(WA, synColors);
     buttons.appendChild(synColors);
 
@@ -538,8 +543,14 @@ var WindowMaker = new function()
     canvas.style.backgroundColor = "#000000";
     container.appendChild(canvas);
 
-
-    // addListener(win, container);
+    // Add window to DOM, init WebGLView (requires element in DOM) and
+    // create a staging list. The listeners are added last to prevent
+    // the execution of the RESIZE handler before the canvas is
+    // initialized.
+    addLogic(win);
+    WA.init( 800, 600, canvas.getAttribute("id") );
+    // Create a Selection Table, preset as the sync target
+    createStagingListWindow( win, WA.getName() );
 
     win.addListener(
       function(callingWindow, signal) {
@@ -578,13 +589,7 @@ var WindowMaker = new function()
         return true;
       });
 
-
-    addLogic(win);
-
-    // Create a Selection Table, preset as the sync target
-    createStagingListWindow( win, WA.getName() );
-
-    WA.init( 800, 600, canvas.getAttribute("id") );
+    // Resize WebGLView after staging list has been added
     win.callListeners( CMWWindow.RESIZE );
 
     SkeletonListSources.updateGUI();
@@ -835,7 +840,8 @@ var WindowMaker = new function()
     var color = document.createElement('select');
     color.setAttribute('id', 'graph_color_choice' + CGW.widgetID);
     color.options.add(new Option('source', 'source'));
-    color.options.add(new Option('review status', 'review'));
+    color.options.add(new Option('review status (union)', 'union-review'));
+    color.options.add(new Option('review status (own)', 'own-review'));
     color.options.add(new Option('input/output', 'I/O'));
     color.options.add(new Option('betweenness centrality', 'betweenness_centrality'));
     color.options.add(new Option('circles of hell', 'circles_of_hell')); // inspired by Tom Jessell's comment
@@ -1511,26 +1517,12 @@ var WindowMaker = new function()
         container.style.backgroundColor = "#ffffff";
         content.appendChild(container);
 
-        var reset = document.createElement('input');
-        reset.setAttribute("type", "button");
-        reset.setAttribute("id", "reset_skeleton_review");
-        reset.setAttribute("value", "Reset revisions");
-        reset.onclick = ReviewSystem.resetAllRevisions;
-        contentbutton.appendChild(reset);
-
         var resetOwns = document.createElement('input');
         resetOwns.setAttribute("type", "button");
         resetOwns.setAttribute("id", "reset_skeleton_review_owns");
         resetOwns.setAttribute("value", "Reset own revisions");
         resetOwns.onclick = ReviewSystem.resetOwnRevisions;
         contentbutton.appendChild(resetOwns);
-
-        var resetOthers = document.createElement('input');
-        resetOthers.setAttribute("type", "button");
-        resetOthers.setAttribute("id", "reset_skeleton_review_owns");
-        resetOthers.setAttribute("value", "Reset revisions by others");
-        resetOthers.onclick = ReviewSystem.resetRevisionsByOthers;
-        contentbutton.appendChild(resetOthers);
 
         var cacheImages = document.createElement('input');
         cacheImages.setAttribute("type", "button");
@@ -2317,6 +2309,26 @@ var WindowMaker = new function()
 
     return win
   };
+
+  var createSettingsWindow = function()
+  {
+    var win = new CMWWindow("Settings");
+    var content = win.getFrame();
+    var container = createContainer("settings");
+    container.setAttribute('id', 'settings_widget');
+    content.appendChild( container );
+    content.style.backgroundColor = "#ffffff";
+
+    // Wire it up
+    addListener(win, container);
+    addLogic(win);
+
+    // Initialize settings window with container added to the DOM
+    var SW = new SettingsWidget();
+    SW.init(container);
+
+    return win;
+  };
   
   var creators = {
     "keyboard-shortcuts": createKeyboardShortcutsWindow,
@@ -2348,6 +2360,7 @@ var WindowMaker = new function()
     "circuit-graph-plot": createCircuitGraphPlot,
     "neuron-annotations": createNeuronAnnotationsWindow,
     "neuron-navigator": createNeuronNavigatorWindow,
+    "settings": createSettingsWindow,
   };
 
   /** If the window for the given name is already showing, just focus it.

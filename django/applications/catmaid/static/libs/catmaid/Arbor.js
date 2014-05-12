@@ -159,6 +159,33 @@ Arbor.prototype.allSuccessors = function() {
 	}, {});
 };
 
+/** Return an object with each nodes as keys and arrays of children plus the parent as values, or an empty array for an isolated root node. Runs in O(2n) time.*/
+Arbor.prototype.allNeighbors = function() {
+	var edges = this.edges,
+			nodes = Object.keys(edges); // except the root
+	// Handle corner cases
+	if (0 === nodes.length) {
+		if (this.root) {
+			var a = {};
+			a[this.root] = [];
+			return a;
+		}
+		return {};
+	}
+	return nodes.reduce(function(o, node) {
+		var paren = edges[node], // always exists in well-formed arbors; root node not included in nodes
+		    neighbors = o[node],
+				paren_neighbors = o[paren];
+	  // Add paren as neighbor of node
+	  if (neighbors) neighbors.push(paren);
+		else o[node] = [paren];
+		// Add node as neighbor of parent
+		if (paren_neighbors) paren_neighbors.push(node);
+		else o[paren] = [node];
+		return o;
+	}, {});
+};
+
 /** Find branch and end nodes in O(4*n) time. */
 Arbor.prototype.findBranchAndEndNodes = function() {
 	var edges = this.edges,
@@ -195,7 +222,7 @@ Arbor.prototype.nodesOrderFrom = function(root) {
 	return this.nodesDistanceTo(root, function() { return 1; }).distances;
 };
 
-/** Measure distance of every node to root, by using the given
+/** Measure distance of every node to root in O(2n), by using the given
  * distanceFn which takes two nodes (child and parent) as arguments and returns a number.
  * Returns an object containing the distances and the maximum distance. */
 Arbor.prototype.nodesDistanceTo = function(root, distanceFn) {
@@ -266,7 +293,7 @@ Arbor.prototype.countNodes = function() {
 /** Returns an array of arrays, unsorted, where the longest array contains the linear
  * path between the furthest end node and the root node, and all other arrays are shorter
  * paths always starting at an end node and finishing at a node already included in
- * another path. Runs in O(3n) time. */
+ * another path. Runs in O(4n + nlog(n)) time. */
 Arbor.prototype.partition = function() {
 	var ends = this.findEndNodes(),
 		  distances = this.nodesOrderFrom(this.root),
@@ -308,6 +335,17 @@ Arbor.prototype.successors = function(node) {
 		if (edges[child] === node) a.push(child);
 		return a;
 	}, []);
+};
+
+/** Returns an array of child nodes plus the parent node in O(n) time.
+ * See also this.allNeighbors() to get them all in one single shot at O(2n) time. */
+Arbor.prototype.neighbors = function(node) {
+	var edges = this.edges,
+			paren = this.edges[node];
+	return Object.keys(edges).reduce(function(a, child) {
+		if (edges[child] === node) a.push(child);
+		return a;
+	}, undefined === paren ? [] : [paren]);
 };
 
 /** Return a new Arbor that has all nodes in the array of nodes to preserve,
@@ -541,4 +579,37 @@ Arbor.prototype.subArbor = function(new_root) {
 	}
 
 	return sub;
+};
+
+/** Return a map of node vs amount of arbor downstream of the node,
+ * where the amountFn is a function that takes two arguments: parent and child.
+ * To obtain a map of node vs number of nodes downstream, amountFn is a function
+ * that returns the value 1. For cable, amountFn returns the length of the cable
+ * between parent and child.
+ * If normalize is defined and true, all values are divided by the maximum value,
+ * which is the value at the root node. */
+Arbor.prototype.downstreamAmount = function(amountFn, normalize) {
+	// Iterate partitions from smallest to largest
+	var values = this.partitionSorted().reduce(function(values, partition) {
+		var child = partition[0],
+			  val = 0;
+		values[child] = 0; // a leaf node by definition
+		for (var k=1, l=partition.length; k<l; ++k) {
+			var paren = partition[k],
+			    amount = amountFn(paren, child),
+			    accumulated = values[paren];
+			val += amount + (undefined === accumulated ? 0 : accumulated);
+	    values[paren] = val;
+		}
+		return values;
+	}, {});
+
+	if (normalize) {
+		var max = values[this.root];
+		Object.keys(values).forEach(function(node) {
+			values[node] = values[node] / max;
+		});
+	}
+
+	return values;
 };
