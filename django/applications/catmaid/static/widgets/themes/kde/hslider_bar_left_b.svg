@@ -15,8 +15,8 @@
    height="25"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="hslider_bar_left_o.svg">
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="hslider_bar_left_b.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -2868,19 +2868,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313708"
-     inkscape:cx="59.632586"
-     inkscape:cy="-32.162922"
+     inkscape:zoom="2.828427"
+     inkscape:cx="230.59838"
+     inkscape:cy="50.464902"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g12007"
      showgrid="true"
      inkscape:snap-bbox="true"
      inkscape:bbox-nodes="true"
      inkscape:object-paths="true"
-     inkscape:window-width="2495"
-     inkscape:window-height="1576"
-     inkscape:window-x="65"
-     inkscape:window-y="24"
+     inkscape:window-width="1680"
+     inkscape:window-height="980"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
      inkscape:window-maximized="1"
      inkscape:snap-page="true"
      inkscape:bbox-paths="true"
@@ -2898,7 +2898,8 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:snap-object-midpoints="true">
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-grids="false">
     <inkscape:grid
        type="xygrid"
        id="grid3058"
@@ -2917,7 +2918,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -2930,15 +2931,16 @@
        id="g12013"
        transform="translate(0,-30)">
       <g
-         id="g12007">
+         id="g12007"
+         style="fill:#4d4d4d">
         <path
            inkscape:connector-curvature="0"
            id="path11549"
            d="m -26,934.36222 c -0.552285,0 -1,0.44772 -1,1 0,0.55229 0.447715,1 1,1 l 1,0 0,-2 z"
-           style="fill:#0000ff;fill-opacity:1;stroke:url(#linearGradient12053);stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
+           style="fill:#4d4d4d;fill-opacity:1;stroke:url(#linearGradient12053);stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
            sodipodi:nodetypes="sssccs" />
         <rect
-           style="fill:#0000ff;fill-opacity:1;stroke:#b9b9b9;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           style="fill:#4d4d4d;fill-opacity:1;stroke:#b9b9b9;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
            id="rect11551"
            width="252"
            height="1.0000021"
@@ -2950,12 +2952,13 @@
            height="1.0000021"
            width="252"
            id="rect11553"
-           style="fill:#0000ff;fill-opacity:1;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+           style="fill:#4d4d4d;fill-opacity:1;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
         <path
-           style="fill:#0000ff;fill-opacity:1;stroke:none"
-           d="m -26,934.36222 c -0.552285,0 -1,0.44772 -1,1 0,0.55229 0.447715,1 1,1 l 254,0 0,-2 -254,0 z"
+           style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+           d="m -26.007842,933.36221 c -1.10024,0 -1.992158,0.89544 -1.992158,1.99999 0,1.10459 0.891918,2.00001 1.992158,2.00001 l 254.007842,0 0,-4 z"
            id="path11555"
-           inkscape:connector-curvature="0" />
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="sssccs" />
       </g>
       <g
          id="g11973">
