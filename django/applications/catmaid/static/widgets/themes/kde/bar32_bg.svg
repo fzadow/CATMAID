@@ -535,19 +535,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568543"
-     inkscape:cx="67.641923"
-     inkscape:cy="28.451022"
+     inkscape:zoom="22.627417"
+     inkscape:cx="11.439962"
+     inkscape:cy="17.444366"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:snap-bbox="true"
      inkscape:bbox-nodes="true"
      inkscape:object-paths="true"
-     inkscape:window-width="1847"
-     inkscape:window-height="1053"
-     inkscape:window-x="73"
-     inkscape:window-y="27"
+     inkscape:window-width="1680"
+     inkscape:window-height="980"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
      inkscape:window-maximized="1"
      inkscape:snap-page="true"
      inkscape:bbox-paths="true"
@@ -565,7 +565,8 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:snap-object-midpoints="true">
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-grids="true">
     <inkscape:grid
        type="xygrid"
        id="grid3058"
@@ -584,7 +585,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -593,25 +594,14 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(4,-1024.3622)">
-    <g
-       id="g18358"
-       transform="translate(-57,4.0000078)">
-      <rect
-         y="1020.3622"
-         x="53"
-         height="32.000019"
-         width="32"
-         id="rect18328"
-         style="fill:url(#linearGradient18362);fill-opacity:1;stroke:none" />
-      <rect
-         transform="translate(0,1028.3622)"
-         y="-7"
-         x="53"
-         height="30"
-         width="32"
-         id="rect18304"
-         style="fill:url(#linearGradient18364);fill-opacity:1;stroke:none" />
-    </g>
+    <rect
+       style="fill:#f0f0f0;fill-opacity:1"
+       id="rect5343"
+       width="32"
+       height="31"
+       x="0"
+       y="2.6973486e-05"
+       transform="translate(-4,1024.3622)" />
   </g>
   <g
      inkscape:groupmode="layer"
