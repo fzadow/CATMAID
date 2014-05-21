@@ -24,7 +24,7 @@ function Navigator()
 
 	// Position markers (duplicated cursors)
 	var position_markers = new Array();
-	var position_marker_path = STATIC_URL_JS + "widgets/themes/kde/svg-cursor-light-30px.png";
+	var position_marker_path = STATIC_URL_JS + "widgets/themes/kde/cursor.svg";
 	var position_marker_width = 30;
 	var position_marker_height = 30;
 
