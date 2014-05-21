@@ -182,21 +182,33 @@ function Navigator()
 	
 	var onmouseup = function( e )
 	{
-		ui.releaseEvents(); 
-		ui.removeEvent( "onmousemove", onmousemove.move );
-		ui.removeEvent( "onmouseup", onmouseup );
+		switch ( ui.getMouseButton( e ) )
+		{
+		case 1:
+			ui.removeEvent( "onmousemove", onmousemove.move );
+			ui.removeEvent( "onmouseup", onmouseup );
+			break;
+		}
+		
+		ui.releaseEvents();
+
 		return false;
 	};
 	
 	var onmousedown = function( e )
 	{
-		ui.registerEvent( "onmousemove", onmousemove.move );
-		ui.registerEvent( "onmouseup", onmouseup );
-		ui.catchEvents( "move" );
+		switch ( ui.getMouseButton( e ) )
+		{
+		case 1:
+			ui.registerEvent( "onmousemove", onmousemove.move );
+			ui.registerEvent( "onmouseup", onmouseup );
+			ui.catchEvents( "move" );
+			break;
+		}
+
 		ui.onmousedown( e );
-		
 		ui.catchFocus();
-		
+
 		return false;
 	};
 	
