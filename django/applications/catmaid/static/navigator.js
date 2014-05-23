@@ -158,8 +158,6 @@ function Navigator()
 			var project_pos_y = self.stack.stackToProjectY( self.stack.z, mouseStackY, mouseStackX );
 			var project_pos_z = self.stack.stackToProjectZ( self.stack.z, mouseStackY, mouseStackX );
 
-			statusBar.replaceLast( "[" + project_pos_x.toFixed( 3 ) + ", " + project_pos_y.toFixed( 3 ) + ", " + project_pos_z.toFixed( 3 ) + "]" );
-		
 			// update position markers in other open stacks
 			for ( i = 0; i < position_markers.length; ++i )
 			{
