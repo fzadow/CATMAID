@@ -30,6 +30,7 @@ urlpatterns += patterns('',
 if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+        (r'^data/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/felix/dev/catmaid-data' }),
         (r'^%s(?P<path>.*)$' % settings.MEDIA_URL.replace(settings.CATMAID_URL, ''),
             'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )
