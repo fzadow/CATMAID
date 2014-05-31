@@ -25,7 +25,7 @@ div.sliceView
  */
 #sliceViewZoom
 {
-	-webkit-transition: all .1s ease-out;
+	-webkit-transition: all .2s ease-out;
 }
 
 div.sliceView div.sliceTiles

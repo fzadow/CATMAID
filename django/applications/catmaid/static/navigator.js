@@ -294,9 +294,12 @@ function Navigator()
 	{
 		if ( old_scale == new_scale ) return;
 		
-		var scale = .5;
+		var scale;
 		if ( old_scale > new_scale ) {
-			scale = 2;
+			scale = Math.pow( 2, ( old_scale - new_scale ) );
+		}
+		else {
+			scale = Math.pow( 0.5, ( new_scale - old_scale ) );
 		}
 		
 		// get tile layer
@@ -314,7 +317,7 @@ function Navigator()
 		// animate and remove afterwards
 		setTimeout( function() { $sliceViewZoom.css( '-webkit-transform', 'scale(' + scale + ')' ); }, 10 );
 		//$sliceViewZoom.css( '-webkit-transform', 'scale(' + scale + ')' );
-		setTimeout( function() { $sliceViewZoom.remove(); }, 100 );
+		setTimeout( function() { $sliceViewZoom.remove(); }, 200 );
 	};
 
 	/**
