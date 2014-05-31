@@ -285,9 +285,37 @@ function Navigator()
 	
 	this.changeScale = function( val )
 	{
+		self.animateZoom( self.stack.s, val )
 		self.stack.moveToPixel( self.stack.z, self.stack.y, self.stack.x, val );
 		return;
 	}
+	
+	this.animateZoom = function( old_scale, new_scale )
+	{
+		if ( old_scale == new_scale ) return;
+		
+		var scale = .5;
+		if ( old_scale > new_scale ) {
+			scale = 2;
+		}
+		
+		// get tile layer
+		var $sliceView = $( '#' + self.stack.getView().id );
+		
+		// clone tile layer and remove everything that is not image tiles
+		var $sliceViewZoom = $sliceView.clone();
+		$sliceViewZoom.attr( 'id', 'sliceViewZoom' );
+		$sliceViewZoom.children( ":not(.sliceTiles)" ).each( function() {
+			$(this).remove()
+		} );
+		
+		$sliceViewZoom.insertAfter( $sliceView );
+
+		// animate and remove afterwards
+		setTimeout( function() { $sliceViewZoom.css( '-webkit-transform', 'scale(' + scale + ')' ); }, 10 );
+		//$sliceViewZoom.css( '-webkit-transform', 'scale(' + scale + ')' );
+		setTimeout( function() { $sliceViewZoom.remove(); }, 100 );
+	};
 
 	/**
 	 * change the scale, making sure that the point keep_[xyz] stays in

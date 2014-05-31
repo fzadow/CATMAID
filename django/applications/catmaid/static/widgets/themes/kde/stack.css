@@ -20,6 +20,14 @@ div.sliceView
 	overflow:hidden;
 }
 
+/*
+ * Copy of the sliceView div used temporarily for a zoom animation
+ */
+#sliceViewZoom
+{
+	-webkit-transition: all .1s ease-out;
+}
+
 div.sliceView div.sliceTiles
 {
 	/* this has to be the 2nd rule for automated parsing */
