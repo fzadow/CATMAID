@@ -309,22 +309,17 @@ function Navigator()
 			scale = Math.pow( 0.5, ( new_scale - old_scale ) );
 		}
 		
-		// get tile layer
-		var $sliceView = $( '#' + self.stack.getView().id );
+		// get tile layer and clone it
+		var $sliceTiles = $( '#' + self.stack.getView().id ).children( '.sliceTiles' ).eq( 0 );
+		var $sliceTilesZoom = $sliceTiles.clone();
+		$sliceTilesZoom.attr( 'id', 'sliceTilesZoom' );
 		
-		// clone tile layer and remove everything that is not image tiles
-		var $sliceViewZoom = $sliceView.clone();
-		$sliceViewZoom.attr( 'id', 'sliceViewZoom' );
-		$sliceViewZoom.children( ":not(.sliceTiles)" ).each( function() {
-			$(this).remove()
-		} );
-		
-		$sliceViewZoom.insertAfter( $sliceView );
+		$sliceTilesZoom.insertAfter( $sliceTiles );
 
 		// animate and remove afterwards
-		setTimeout( function() { $sliceViewZoom.css( '-webkit-transform', 'scale(' + scale + ')' ); }, 10 );
-		//$sliceViewZoom.css( '-webkit-transform', 'scale(' + scale + ')' );
-		setTimeout( function() { $sliceViewZoom.remove(); }, 200 );
+		setTimeout( function() { $sliceTilesZoom.css( '-webkit-transform', 'scale(' + scale + ')' ); }, 10 );
+		//$sliceTilesZoom.css( '-webkit-transform', 'scale(' + scale + ')' );
+		setTimeout( function() { $sliceTilesZoom.remove(); }, 200 );
 	};
 
 	/**
