@@ -127,6 +127,13 @@ function Navigator()
 		ui.releaseEvents(); 
 		ui.removeEvent( "onmousemove", onmousemove );
 		ui.removeEvent( "onmouseup", onmouseup );
+		
+		// zoom in if double left click was detected
+		// TODO zoom at cursor position
+		if( ui.doubleClick && self.stack.s > self.stack.MIN_S ) {
+			self.changeScale( self.stack.s - 1 );
+		}
+		
 		return false;
 	};
 	
