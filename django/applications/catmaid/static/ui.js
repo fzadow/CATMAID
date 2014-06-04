@@ -17,6 +17,7 @@ UI = function()
 	var screenHeight = 0;
 	
 	var leftMouseDown = false;
+	var leftMouseDownTime;
 	var rightMouseDown = false;
 	var shiftKeyDown = false;
 	var ctrlKeyDown = false;
@@ -25,6 +26,8 @@ UI = function()
 	var lastY = 0;
 	var x = 0;
 	var y = 0;
+	
+	this.doubleClick = false;
 	
 	var events = new Object();
 	events[ "onmousemove" ] = new Array();	//!< bound to eventCatcher
@@ -285,6 +288,21 @@ UI = function()
 				{
 				case 1:
 					leftMouseDown = true;
+					
+					// save current time and compare with last saved time to detect
+					// double clicks.
+					var now = Date.now();
+					if( leftMouseDownTime ) {
+						var since = now - leftMouseDownTime;
+						if( since < 500 ) {
+							self.doubleClick = true;
+						}
+						else {
+							self.doubleClick = false;
+						}
+					}
+					leftMouseDownTime = now;
+					
 					break;
 				case 3:
 					rightMouseDown = true;
@@ -321,6 +339,9 @@ UI = function()
 				{
 				case 1:
 					leftMouseDown = false;
+					if( self.doubleClick ) {
+						
+					}
 					break;
 				case 3:
 					rightMouseDown = false;
