@@ -244,121 +244,83 @@ function TracingTool()
 {
   var actions = self.prototype.getActions();
 
-  this.addAction( new Action({
-    helpText: "Move up (towards negative y)",
-    keyShortcuts: {
-      "\u2191": [ arrowKeyCodes.up ]
-    },
-    run: function (e) {
-      self.prototype.input_y.value = parseInt(self.prototype.input_y.value, 10) - (e.shiftKey ? 100 : (e.altKey ? 1 : 10));
-      self.prototype.input_y.onchange(e);
-      return true;
-    }
-  }) );
-
-  this.addAction( new Action({
-    helpText: "Move down (towards positive y)",
-    keyShortcuts: {
-      "\u2193": [ arrowKeyCodes.down ]
-    },
-    run: function (e) {
-      self.prototype.input_y.value = parseInt(self.prototype.input_y.value, 10) + (e.shiftKey ? 100 : (e.altKey ? 1 : 10));
-      self.prototype.input_y.onchange(e);
-      return true;
-    }
-  }) );
-
-    this.addAction( new Action({
-        helpText: "Switch to skeleton tracing mode",
-        buttonName: "skeleton",
-        buttonID: 'trace_button_skeleton',
-        keyShortcuts: {
-            ";": [ 186 ]
-        },
-        run: function (e) {
-          SkeletonAnnotations.setTracingMode(SkeletonAnnotations.MODES.SKELETON);
-          return true;
-        }
-    } ) );
-
-    this.addAction( new Action({
-      helpText: "Switch to synapse dropping mode",
-      buttonName: "synapse",
-      buttonID: 'trace_button_synapse',
+  self.prototype.addAction( new Action( {
+      helpText: "Switch to skeleton tracing mode",
+      buttonName: "skeleton",
+      buttonID: 'trace_button_skeleton',
+      keyShortcuts: { ";": [ 186 ] },
       run: function (e) {
-        if (!mayEdit())
-          return false;
-        SkeletonAnnotations.setTracingMode(SkeletonAnnotations.MODES.SYNAPSE);
+        SkeletonAnnotations.setTracingMode(SkeletonAnnotations.MODES.SKELETON);
         return true;
       }
-    } ) );
+  } ) );
 
-    /** Return a function that attempts to tag the active treenode or connector,
-     * and display an alert when no node is active.
-     */
-    var tagFn = function(tag) {
-      return function(e) {
-        if (!mayEdit()) return false;
-        if (e.ctrlKey) return false;
-        var modifier = e.metaKey || e.shiftKey;
-        if (null === SkeletonAnnotations.getActiveNodeId()) {
-          alert('Must activate a treenode or connector before '
-              + (modifier ? 'removing the tag' : 'tagging with') + ' "' + tag + '"!');
-          return true;
-        }
-        // If any modifier key is pressed, remove all tags
-        SkeletonAnnotations.Tag.tagATNwithLabel( modifier ? '' : tag, tracingLayer.svgOverlay);
+  self.prototype.addAction( new Action({
+    helpText: "Switch to synapse dropping mode",
+    buttonName: "synapse",
+    buttonID: 'trace_button_synapse',
+    run: function (e) {
+      if (!mayEdit())
+        return false;
+      SkeletonAnnotations.setTracingMode(SkeletonAnnotations.MODES.SYNAPSE);
+      return true;
+    }
+  } ) );
+
+  /** Return a function that attempts to tag the active treenode or connector,
+   * and display an alert when no node is active.
+   */
+  var tagFn = function(tag) {
+    return function(e) {
+      if (!mayEdit()) return false;
+      if (e.ctrlKey) return false;
+      var modifier = e.metaKey || e.shiftKey;
+      if (null === SkeletonAnnotations.getActiveNodeId()) {
+        alert('Must activate a treenode or connector before '
+            + (modifier ? 'removing the tag' : 'tagging with') + ' "' + tag + '"!');
         return true;
-      };
+      }
+      // If any modifier key is pressed, remove all tags
+      SkeletonAnnotations.Tag.tagATNwithLabel( modifier ? '' : tag, tracingLayer.svgOverlay);
+      return true;
     };
+  };
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Add ends Tag (Shift: Remove) for the active node",
-    keyShortcuts: {
-      "K": [ 75 ]
-    },
-      run: tagFn('ends')
+    keyShortcuts: { "K": [ 75 ] }, 
+    run: tagFn('ends')
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Add 'uncertain end' Tag (Shift: Remove) for the active node",
-    keyShortcuts: {
-      "U": [ 85 ]
-    },
-      run: tagFn('uncertain end')
+    keyShortcuts: { "U": [ 85 ] },
+    run: tagFn('uncertain end')
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Add 'uncertain continuation' Tag (Shift: Remove) for the active node",
-    keyShortcuts: {
-      "C": [ 67 ]
-    },
-      run: tagFn('uncertain continuation')
+    keyShortcuts: { "C": [ 67 ] },
+    run: tagFn('uncertain continuation')
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Add 'not a branch' Tag (Shift: Remove) for the active node",
-    keyShortcuts: {
-      "N": [ 78 ]
-    },
-      run: tagFn('not a branch')
+    keyShortcuts: { "N": [ 78 ] },
+    run: tagFn('not a branch')
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Add 'soma' Tag (Shift: Remove) for the active node",
-    keyShortcuts: {
-      "M": [ 77 ]
-    },
-      run: tagFn('soma')
+    keyShortcuts: { "M": [ 77 ] },
+    run: tagFn('soma')
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Go to active node",
     buttonName: "goactive",
     buttonID: 'trace_button_goactive',
-    keyShortcuts: {
-      "A": [ 65 ]
-    },
+    keyShortcuts: { "A": [ 65 ] },
     run: function (e) {
       if (!mayView())
         return false;
@@ -367,11 +329,9 @@ function TracingTool()
     }
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Next open leaf node",
-    keyShortcuts: {
-      "R": [ 82 ]
-    },
+    keyShortcuts: { "R": [ 82 ] },
     run: function (e) {
       if (!mayView())
         return false;
@@ -380,11 +340,9 @@ function TracingTool()
     }
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Go to next branch or end point (with alt, stop earlier at node with tag, synapse or low confidence; with shift and at a branch node, move down the other branch)",
-    keyShortcuts: {
-      "V": [ 86 ]
-    },
+    keyShortcuts: { "V": [ 86 ] },
     run: function (e) {
       if (!mayView())
         return false;
@@ -393,11 +351,9 @@ function TracingTool()
     }
   } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Go to previous branch or end node (with alt, stop earlier at node with tag, synapse or low confidence)",
-    keyShortcuts: {
-      "B": [ 66 ]
-    },
+    keyShortcuts: { "B": [ 66 ] },
     run: function (e) {
       if (!mayView())
         return false;
@@ -407,59 +363,51 @@ function TracingTool()
   } ) );
 
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Deselect the active node",
-    keyShortcuts:  {
-      "D": [ 68 ]
-    },
+    keyShortcuts: { "D": [ 68 ] },
     run: function (e) {
       if (!mayView())
         return false;
       tracingLayer.svgOverlay.activateNode(null);
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Go to the parent of the active node",
-    keyShortcuts: {
-      "P": [ 80 ]
-    },
+    keyShortcuts: { "P": [ 80 ] },
     run: function (e) {
       if (!mayView())
         return false;
       tracingLayer.svgOverlay.goToParentNode(SkeletonAnnotations.getActiveNodeId());
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Edit the radius of the active node",
-    keyShortcuts: {
-      "O": [ 79 ]
-    },
+    keyShortcuts: { "O": [ 79 ] },
     run: function (e) {
       if (!mayView())
         return false;
       tracingLayer.svgOverlay.editRadius(SkeletonAnnotations.getActiveNodeId());
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Go to last edited node in this skeleton",
-    keyShortcuts: {
-      "H": [ 72 ]
-    },
+    keyShortcuts: { "H": [ 72 ] },
     run: function (e) {
       if (!mayView())
         return false;
       tracingLayer.svgOverlay.goToLastEditedNode(SkeletonAnnotations.getActiveSkeletonId());
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Split this skeleton at the active node",
     buttonName: "skelsplitting",
     buttonID: 'trace_button_skelsplitting',
@@ -469,39 +417,35 @@ function TracingTool()
       tracingLayer.svgOverlay.splitSkeleton(SkeletonAnnotations.getActiveNodeId());
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Re-root this skeleton at the active node",
     buttonName: "skelrerooting",
     buttonID: 'trace_button_skelrerooting',
-    keyShortcuts: {
-      "6": [ 54 ]
-    },
+    keyShortcuts: { "6": [ 54 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
       tracingLayer.svgOverlay.rerootSkeleton(SkeletonAnnotations.getActiveNodeId());
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Toggle the display of labels",
     buttonName: "togglelabels",
     buttonID: 'trace_button_togglelabels',
-    keyShortcuts: {
-      "7": [ 55 ]
-    },
+    keyShortcuts: { "7": [ 55 ] },
     run: function (e) {
       if (!mayView())
         return false;
       tracingLayer.svgOverlay.toggleLabels();
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Export to SWC",
     buttonName: "exportswc",
     buttonID: 'trace_button_exportswc',
@@ -511,26 +455,22 @@ function TracingTool()
       SkeletonAnnotations.exportSWC();
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Switch between a terminal and its connector",
-    keyShortcuts: {
-      "S": [ 83 ]
-    },
+    keyShortcuts: { "S": [ 83 ] },
     run: function (e) {
       if (!mayView())
         return false;
       tracingLayer.svgOverlay.switchBetweenTerminalAndConnector();
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Tag the active node",
-    keyShortcuts: {
-      "T": [ 84 ]
-    },
+    keyShortcuts: { "T": [ 84 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
@@ -541,21 +481,17 @@ function TracingTool()
         return false;
       }
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Add TODO Tag (Shift: Remove) for the active node",
-    keyShortcuts: {
-      "L": [ 76 ]
-    },
+    keyShortcuts: { "L": [ 76 ] },
     run: tagFn('TODO')
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Select the nearest node to the mouse cursor",
-    keyShortcuts: {
-      "G": [ 71 ]
-    },
+    keyShortcuts: { "G": [ 71 ] },
     run: function (e) {
       if (!mayView())
         return false;
@@ -566,52 +502,44 @@ function TracingTool()
         return false;
       }
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Create treenode with z axis interpolation (Shift on another node: interpolate and join)",
-    keyShortcuts: {
-      'Z': [ 90 ]
-    },
+    keyShortcuts: { 'Z': [ 90 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
       tracingLayer.svgOverlay.createInterpolatedTreenode(e);
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Retrieve information about the active node.",
-    keyShortcuts: {
-      'I': [ 73 ]
-    },
+    keyShortcuts: { 'I': [ 73 ] },
     run: function (e) {
       if (!mayView())
         return false;
       tracingLayer.svgOverlay.printTreenodeInfo(SkeletonAnnotations.getActiveNodeId());
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Set confidence in node link to 1 (Alt: with a connector)",
-    keyShortcuts: {
-      '1': [ 49 ]
-    },
+    keyShortcuts: { '1': [ 49 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
       tracingLayer.svgOverlay.setConfidence(1, e.altKey);
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Set confidence in node link to 2 (Alt: with a connector)",
-    keyShortcuts: {
-      '2': [ 50 ]
-    },
+    keyShortcuts: { '2': [ 50 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
@@ -620,50 +548,42 @@ function TracingTool()
     }
   }) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Set confidence in node link to 3 (Alt: with a connector)",
-    keyShortcuts: {
-      '3': [ 51 ]
-    },
+    keyShortcuts: { '3': [ 51 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
       tracingLayer.svgOverlay.setConfidence(3, e.altKey);
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Set confidence in node link to 4 (Alt: with a connector)",
-    keyShortcuts: {
-      '4': [ 52 ]
-    },
+    keyShortcuts: { '4': [ 52 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
       tracingLayer.svgOverlay.setConfidence(4, e.altKey);
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
     helpText: "Set confidence in node link to 5 (Alt: with a connector)",
-    keyShortcuts: {
-      '5': [ 53 ]
-    },
+    keyShortcuts: { '5': [ 53 ] },
     run: function (e) {
       if (!mayEdit())
         return false;
       tracingLayer.svgOverlay.setConfidence(5, e.altKey);
       return true;
     }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
       helpText: "Move to previous node in segment for review. At an end node, moves one section beyond for you to check that it really ends.",
-      keyShortcuts: {
-          'Q': [ 81 ]
-      },
+      keyShortcuts: { 'Q': [ 81 ] },
       run: function (e) {
           if (!mayEdit())
               return false;
@@ -671,13 +591,11 @@ function TracingTool()
               ReviewSystem.moveNodeInSegmentBackward();
           return true;
       }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
       helpText: "Move to next node in segment for review (with shift, move to next unreviewed node in the segment)",
-      keyShortcuts: {
-          'W': [ 87 ]
-      },
+      keyShortcuts: { 'W': [ 87 ] },
       run: function (e) {
           if (!mayEdit())
               return false;
@@ -685,13 +603,11 @@ function TracingTool()
               ReviewSystem.moveNodeInSegmentForward(e);
           return true;
       }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
       helpText: "Start reviewing the next skeleton segment.",
-      keyShortcuts: {
-          'E': [ 69 ]
-      },
+      keyShortcuts: { 'E': [ 69 ] },
       run: function (e) {
           if (!mayEdit())
               return false;
@@ -699,22 +615,20 @@ function TracingTool()
               ReviewSystem.selectNextSegment(e);
           return true;
       }
-  }) );
+  } ) );
 
-  this.addAction( new Action({
+  self.prototype.addAction( new Action( {
       helpText: "Rename object tree node or current active neuron (Shift key)",
-      keyShortcuts: {
-          'F2': [ 113 ]
-      },
+      keyShortcuts: { 'F2': [ 113 ] },
       run: function (e) {
-          if (!mayEdit()) {
+          if (!mayEdit())
               return false;
-          }
           if (e.shiftKey) tracingLayer.svgOverlay.renameNeuron(SkeletonAnnotations.getActiveSkeletonId());
           return true;
       }
-  }) );
+  } ) );
 
+}
 
   var keyCodeToAction = getKeyCodeToActionMap(actions);
 
