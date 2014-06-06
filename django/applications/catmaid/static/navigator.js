@@ -10,13 +10,12 @@
  */
 
 /**
- */
-
-/**
  * Navigator tool.  Moves the stack around 
  */
 function Navigator()
 {
+	"use strict";
+
 	var self = this;
 	this.stack = null;
 	this.toolname = "navigator";
@@ -36,11 +35,13 @@ function Navigator()
 	this.checkbox_reflines = document.getElementById( "displayreflines" );
 
 	// Last mouse position for proper zoom with + and -
+	// TODO never used.
 	var lastX = 0, lastY = 0;
 	
 	/* remove all existing dimension sliders */
-	while ( sliders_box.firstChild )
+	while ( sliders_box.firstChild ) {
 		sliders_box.removeChild( sliders_box.firstChild );
+	}
 	
 	this.slider_z = new Slider(
 			SLIDER_HORIZONTAL,
@@ -56,12 +57,7 @@ function Navigator()
 			true,
 			undefined,
 			undefined,
-			new Array(
-				0,
-				1,
-				2,
-				4,
-				8 ),
+			[ 0, 1, 2, 4, 8 ],
 			8,
 			function( val ){ statusBar.replaceLast( "s: " + val ); } );
 	
@@ -70,7 +66,7 @@ function Navigator()
 	slider_z_box.id = "slider_z_box";
 	var slider_z_box_label = document.createElement( "p" );
 	slider_z_box_label.appendChild( document.createTextNode( "z-index" + "\u00a0\u00a0" ) );
-    slider_z_box.appendChild( slider_z_box_label );
+  slider_z_box.appendChild( slider_z_box_label );
 	slider_z_box.appendChild( self.slider_z.getView() );
 	slider_z_box.appendChild( self.slider_z.getInputView() );
 	
@@ -92,7 +88,7 @@ function Navigator()
 	this.setMouseCatcher = function( mc )
 	{
 		self.mouseCatcher = mc;
-	}
+	};
 	
 	this.updateControls = function()
 	{
@@ -103,23 +99,23 @@ function Navigator()
 		self.input_y.value = self.stack.y;
 		
 		return;
-	}
+	};
 	
 	this.resize = function( width, height )
 	{
 		self.mouseCatcher.style.width = width + "px";
 		self.mouseCatcher.style.height = height + "px";
 		return;
-	}
+	};
 	
 	this.redraw = function()
 	{
 		self.updateControls();
-	}
+	};
 	
 	var onmousemove =
 	{
-		move : function( e )
+		drag : function( e )
 		{
 			self.lastX = self.stack.x + ui.diffX; // TODO - or + ?
 			self.lastY = self.stack.y + ui.diffY;
@@ -133,6 +129,7 @@ function Navigator()
 
 			return true;
 		},
+		// TODO rename to move
 		pos : function ( e )
 		{
 			
@@ -175,7 +172,7 @@ function Navigator()
 			var project_pos_z = self.stack.stackToProjectZ( self.stack.z, mouseStackY, mouseStackX );
 
 			// update position markers in other open stacks
-			for ( i = 0; i < position_markers.length; ++i )
+			for ( var i = 0; i < position_markers.length; ++i )
 			{
 				var current_stack = position_markers[ i ].stack;
 
@@ -192,7 +189,7 @@ function Navigator()
 				stack_marker.style.top = rel_y + "px";
 			}
 		}
-	}
+	};
 	
 	this.hidePositionMarkers = function( e )
 	{
@@ -215,7 +212,7 @@ function Navigator()
 		switch ( ui.getMouseButton( e ) )
 		{
 		case 1:
-			ui.removeEvent( "onmousemove", onmousemove.move );
+			ui.removeEvent( "onmousemove", onmousemove.drag );
 			ui.removeEvent( "onmouseup", onmouseup );
 			break;
 		}
@@ -230,7 +227,7 @@ function Navigator()
 		switch ( ui.getMouseButton( e ) )
 		{
 		case 1:
-			ui.registerEvent( "onmousemove", onmousemove.move );
+			ui.registerEvent( "onmousemove", onmousemove.drag );
 			ui.registerEvent( "onmouseup", onmouseup );
 			ui.catchEvents( "move" );
 			break;
@@ -242,76 +239,20 @@ function Navigator()
 		return false;
 	};
 
-	var onmousewheel = 
+	var onmousewheel = function( e )
 	{
-		zoom : function( e )
+		var direction = ui.getMouseWheel( e );
+		if ( direction )
 		{
-			var w = ui.getMouseWheel( e );
-			if ( w )
-			{
-        		w = self.stack.inverse_mouse_wheel * w;
-				if ( w > 0 )
-				{
-          if( e.shiftKey ) {
-            self.slider_z.move( 10 );
-          } else {
-            self.slider_z.move( 1 );
-          }
-				}
-				else
-				{
-          if( e.shiftKey ) {
-            self.slider_z.move( -10 );
-          } else {
-            self.slider_z.move( -1 );
-          }
-
-				}
-			}
-			return false;
-		},
-		move : function( e )
-		{
-			var xp = self.stack.x;
-			var yp = self.stack.y;
-			var m = ui.getMouse( e, self.stack.getView() );
-			var w = ui.getMouseWheel( e );
-			if ( m )
-			{
-				xp = m.offsetX - self.stack.viewWidth / 2;
-				yp = m.offsetY - self.stack.viewHeight / 2;
-				//statusBar.replaceLast( ( m.offsetX - viewWidth / 2 ) + " " + ( m.offsetY - viewHeight / 2 ) );
-			}
-			if ( w )
-			{
-				if ( w > 0 )
-				{
-					if ( self.stack.s < self.stack.MAX_S )
-					{
-						self.stack.moveToPixel(
-							self.stack.z,
-							self.stack.y - Math.floor( yp / self.stack.scale ),
-							self.stack.x - Math.floor( xp / self.stack.scale ),
-							self.stack.s + 1 );
-					}
-				}
-				else
-				{
-					if ( self.stack.s > 0 )
-					{
-						var ns = self.stack.scale * 2;
-						self.moveToPixel(
-							self.stack.z,
-							self.stack.y + Math.floor( yp / ns ),
-							self.stack.x + Math.floor( xp / ns ),
-							self.stack.s - 1 );
-					}
-				}
-			}
-			return false;
+			// invert direction if requested
+			direction = direction * self.stack.inverse_mouse_wheel;
+			
+			// move slider in direction by 1 or 10 stops 
+			self.slider_z.move( direction * ( e.shiftKey ? 10 : 1 ) );
 		}
+		return false;
 	};
-	
+
 	//--------------------------------------------------------------------------
 	/**
 	 * Slider commands for changing the slice come in too frequently, thus the
@@ -328,20 +269,20 @@ function Navigator()
 		self.changeSlice( changeSliceDelayedParam.z );
 		changeSliceDelayedParam = null;
 		return false;
-	}
+	};
 	
 	this.changeSliceDelayed = function( val )
 	{
 		if ( changeSliceDelayedTimer ) window.clearTimeout( changeSliceDelayedTimer );
 		changeSliceDelayedParam = { z : val };
 		changeSliceDelayedTimer = window.setTimeout( changeSliceDelayedAction, 100 );
-	}
+	};
 	
 	this.changeSlice = function( val )
 	{
 		self.stack.moveToPixel( val, self.stack.y, self.stack.x, self.stack.s );
 		return;
-	}
+	};
 	//--------------------------------------------------------------------------
 	
 	//--------------------------------------------------------------------------
@@ -357,20 +298,20 @@ function Navigator()
 		self.changeScale( changeScaleDelayedParam.s );
 		changeScaleDelayedParam = null;
 		return false;
-	}
+	};
 	
 	this.changeScaleDelayed = function( val )
 	{
 		if ( changeScaleDelayedTimer ) window.clearTimeout( changeScaleDelayedTimer );
 		changeScaleDelayedParam = { s : val };
 		changeScaleDelayedTimer = window.setTimeout( changeScaleDelayedAction, 100 );
-	}
+	};
 	
 	this.changeScale = function( val )
 	{
 		self.stack.moveToPixel( self.stack.z, self.stack.y, self.stack.x, val );
 		return;
-	}
+	};
 
 	/**
 	 * change the scale, making sure that the point keep_[xyz] stays in
@@ -392,7 +333,7 @@ function Navigator()
 		var new_centre_y = keep_y - dy * (old_scale / new_scale);
 
 		self.stack.moveTo(self.stack.getProject().coordinates.z, new_centre_y, new_centre_x, sp);
-	}
+	};
 
 	//--------------------------------------------------------------------------
 	
@@ -402,7 +343,7 @@ function Navigator()
 		if ( isNaN( val ) ) this.value = self.stack.x;
 		else self.stack.moveToPixel( self.stack.z, self.stack.y, val, self.stack.s );
 		return;
-	}
+	};
 	
 	var changeYByInput = function( e )
 	{
@@ -410,7 +351,7 @@ function Navigator()
 		if ( isNaN( val ) ) this.value = self.stack.y;
 		else self.stack.moveToPixel( self.stack.z, val, self.stack.x, self.stack.s );
 		return;
-	}
+	};
 	
 	var YXMouseWheel = function( e )
 	{
@@ -420,8 +361,8 @@ function Navigator()
 			this.value = parseInt( this.value ) - w;
 			this.onchange();
 		}
-		return false
-	}
+		return false;
+	};
 
 	this.getActions = function () {
 		return actions;
@@ -530,7 +471,7 @@ function Navigator()
 				self.input_y.onchange(e);
 				return true;
 			}
-		})]
+		})];
 
 	var keyCodeToAction = getKeyCodeToActionMap(actions);
 
@@ -540,10 +481,10 @@ function Navigator()
 	 */
 	this.addPositionMarkers = function()
 	{
-		stacks = project.getStacks();
-		for ( i = 0; i < stacks.length; ++i )
+		var stacks = project.getStacks();
+		for ( var i = 0; i < stacks.length; ++i )
 		{
-			s_id = stacks[ i ].id;
+			var s_id = stacks[ i ].id;
 			// don't add one to the current stack
 			if ( s_id == this.stack.id )
 					continue;
@@ -565,7 +506,7 @@ function Navigator()
 				  view : stack_view,
 				  stack : stacks[ i ] };
 		}
-	}
+	};
 
 	/**
 	 * Removes all existant position markers from the views they
@@ -574,15 +515,15 @@ function Navigator()
 	this.removePositionMarkers = function()
 	{
 		// remove all the created div tags
-		for ( i = 0; i < position_markers.length; ++i )
+		for ( var i = 0; i < position_markers.length; ++i )
 		{
-			stack_view = position_markers[ i ].view;
-			stack_marker = position_markers[ i ].marker;
+			var stack_view = position_markers[ i ].view;
+			var stack_marker = position_markers[ i ].marker;
 			stack_view.removeChild( stack_marker );
 		}
 		// Clear the array
-		position_markers.length = 0
-	}
+		position_markers.length = 0;
+	};
 
 	/**
 	 * install this tool in a stack.
@@ -590,7 +531,7 @@ function Navigator()
 	 */
 	this.register = function( parentStack, buttonName )
 	{
-		document.getElementById( typeof buttonName == "undefined" ? "edit_button_move" : buttonName ).className = "button_active";
+		document.getElementById( typeof buttonName === "undefined" ? "edit_button_move" : buttonName ).className = "button_active";
 		document.getElementById( "toolbar_nav" ).style.display = "block";
 		
 		self.stack = parentStack;
@@ -602,15 +543,15 @@ function Navigator()
 		
 		try
 		{
-			self.mouseCatcher.addEventListener( "DOMMouseScroll", onmousewheel.zoom, false );
+			self.mouseCatcher.addEventListener( "DOMMouseScroll", onmousewheel, false );
 			/* Webkit takes the event but does not understand it ... */
-			self.mouseCatcher.addEventListener( "mousewheel", onmousewheel.zoom, false );
+			self.mouseCatcher.addEventListener( "mousewheel", onmousewheel, false );
 		}
 		catch ( error )
 		{
 			try
 			{
-				self.mouseCatcher.onmousewheel = onmousewheel.zoom;
+				self.mouseCatcher.onmousewheel = onmousewheel;
 			}
 			catch ( error ) {}
 		}
@@ -694,7 +635,7 @@ function Navigator()
 		self.addPositionMarkers();
 		
 		return;
-	}
+	};
 	
 	
 	/**
@@ -707,7 +648,7 @@ function Navigator()
 
 		self.removePositionMarkers();
 		return;
-	}
+	};
 	
 	
 	/**
@@ -768,7 +709,7 @@ function Navigator()
 		self.stack = null;
 		
 		return;
-	}
+	};
 
 	/** This function should return true if there was any action
 		linked to the key code, or false otherwise. */
@@ -778,8 +719,7 @@ function Navigator()
 		if (keyAction) {
 			keyAction.run(e);
 			return true;
-		} else {
-			return false;
 		}
-	}
+		return false;
+	};
 }
