@@ -412,7 +412,11 @@ function Navigator()
 
 	this.getActions = function () {
 		return actions;
-	}
+	};
+	
+	this.addAction = function ( action ) {
+		actions.push( action );
+	};
 
 	var arrowKeyCodes = {
 		left: 37,
