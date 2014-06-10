@@ -141,6 +141,22 @@ function Navigator()
 			}
 		}
 	};
+
+	var onmouseout = function( e )
+	{
+		// hide cursor only if relatedTarget is not 'eventCatcher'
+		// (during a drag operation, the sliceMouseCatcher will receive onmouseout
+		// because eventCatcher is focused.)
+		if( e.relatedTarget === null || e.relatedTarget.id !== 'eventCatcher' )
+		{
+			self.hidePositionMarkers( e );
+		}
+	};
+	
+	var onmouseover = function( e )
+	{
+		self.showPositionMarkers( e );
+	};
 	
 	/**
 	 * moves the position markers in all open Stacks
@@ -177,6 +193,22 @@ function Navigator()
 			}
 		}
 	}
+	
+	this.hidePositionMarkers = function( e )
+	{
+		for( var i = 0; i < position_markers.length; i++ )
+		{
+			position_markers[ i ].marker.style.display = 'none';
+		}
+	};
+	
+	this.showPositionMarkers = function( e )
+	{
+		for( var i = 0; i < position_markers.length; i++ )
+			{
+				position_markers[ i ].marker.style.display = 'block';
+			}
+	};
 	
 	var onmouseup = function( e )
 	{
@@ -565,6 +597,8 @@ function Navigator()
 
 		self.mouseCatcher.onmousedown = onmousedown;
 		self.mouseCatcher.onmousemove = onmousemove.pos;
+		self.mouseCatcher.onmouseout = onmouseout;
+		self.mouseCatcher.onmouseover = onmouseover;
 		
 		try
 		{
