@@ -440,50 +440,25 @@ function Project( pid )
 
 	var onkeydown = function( e )
 	{
-		var projectKeyPress;
-		var key;
-		var shift;
-		var alt;
-		var ctrl;
-		var meta;
-		var keyAction;
+		e = e || window.event;
 
-		/* The code here used to modify 'e' and pass it
-		   on, but Firefox no longer allows this.  So, create
-		   a fake event object instead, and pass that down. */
-		var fakeEvent = {};
+		// Don't intercept command-key events on Mac.
+		if (e.metaKey) {
+			return true;
+		}
 
-		if ( e )
-		{
-			if ( e.keyCode ) {
-				key = e.keyCode;
-			} else if ( e.charCode ) {
-				key = e.charCode;
-			} else {
-				key = e.which;
-			}
-			fakeEvent.keyCode = key;
-			fakeEvent.shiftKey = e.shiftKey;
-			fakeEvent.altKey = e.altKey;
-			fakeEvent.ctrlKey = e.ctrlKey;
-			fakeEvent.metaKey = e.metaKey;
-			shift = e.shiftKey;
-			alt = e.altKey;
-			ctrl = e.ctrlKey;
-			meta = e.metaKey;
-		}
-		else if ( event && event.keyCode )
-		{
-			fakeEvent.keyCode = event.keyCode;
-			fakeEvent.shiftKey = event.shiftKey;
-			fakeEvent.altKey = event.altKey;
-			fakeEvent.ctrlKey = event.ctrlKey;
-			fakeEvent.metaKey = event.metaKey;
-			shift = event.shiftKey;
-			alt = event.altKey;
-			ctrl = event.ctrlKey;
-			meta = event.metaKey;
-		}
+		/* The code here used to modify 'e' and pass it on, but Firefox no longer
+		 * allows this. So, create a fake event object instead, and pass that down.
+		 */
+		var fakeEvent = {
+				keyCode : e.keyCode || e.which,
+				shiftKey : e.shiftKey,
+				altKey : e.altKey,
+				ctrlKey : e.ctrlKey,
+				metaKey : e.metaKey
+		};
+
+		// Find target
 		fakeEvent.target = UI.getTargetElement(e || event);
 		var n = fakeEvent.target.nodeName.toLowerCase();
 		var fromATextField = false;
@@ -493,30 +468,30 @@ function Project( pid )
 				fromATextField = true;
 			}
 		}
-		if (meta) {
-			// Don't intercept command-key events on Mac.
+
+		// Don't intercept keys if in a input element
+		// @todo exclude all useful keyboard input elements e.g. contenteditable...
+		if ( ( fromATextField || n == "textarea" || n == "area")) {
 			return true;
 		}
-		if (!(fromATextField || n == "textarea" || n == "area")) //!< @todo exclude all useful keyboard input elements e.g. contenteditable...
+
+		/* Note that there are two different conventions for return values here: the
+		 * handleKeyPress() methods return true if the event has been dealt with
+		 * (i.e. it should not be propagated) but the onkeydown function should only
+		 * return true if the event should carry on for default processing. */
+		if ( tool &&
+				typeof( tool.handleKeyPress ) == typeof( Function ) &&
+				tool.handleKeyPress( fakeEvent ) )
 		{
-			/* Note that there are two different
-			   conventions for return values here: the
-			   handleKeyPress() methods return true if the
-			   event has been dealt with (i.e. it should
-			   not be propagated) but the onkeydown
-			   function should only return true if the
-			   event should carry on for default
-			   processing. */
-			if (tool && tool.handleKeyPress(fakeEvent)) {
-				return false;
-			} else {
-				projectKeyPress = self.handleKeyPress(fakeEvent);
-				return ! projectKeyPress;
-			}
-		} else {
-			return true;
+			return false;
+		}
+		else
+		{
+			return ! self.handleKeyPress(fakeEvent);
 		}
 	}
+	
+	
 	
 	/**
 	 * Get project ID.
