@@ -250,6 +250,7 @@ function Project( pid )
 		//window.onresize();
 		
 		document.onkeydown = onkeydown;
+		document.onkeyup = onkeyup;
 		
 		return;
 	}
@@ -489,6 +490,20 @@ function Project( pid )
 		{
 			return ! self.handleKeyPress(fakeEvent);
 		}
+	}
+	
+	var onkeyup = function( e )
+	{
+		e = e || window.event;
+		
+		if ( tool &&
+				typeof( tool.handleKeyUp ) == typeof( Function ) &&
+				tool.handleKeyUp( e ) )
+		{
+			return false;
+		}
+		
+		return true;
 	}
 	
 	
