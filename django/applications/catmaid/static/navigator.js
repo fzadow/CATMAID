@@ -207,6 +207,14 @@ function Navigator()
 			}
 	};
 	
+	this.showCrosshair = function() {
+		self.mouseCatcher.style.cursor = "url(" + position_marker_path + ") 15 15, crosshair";
+	};
+	
+	this.hideCrosshair = function() {
+		self.mouseCatcher.style.cursor = "move";
+	};
+
 	var onmouseup = function( e )
 	{
 		switch ( ui.getMouseButton( e ) )
@@ -380,6 +388,17 @@ function Navigator()
 	};
 
 	var actions = [
+
+		new Action({
+			helpText: "Show crosshair cursor (hold CTRL down)",
+			keyShortcuts: {
+				'CTRL': [ 17 ]
+			},
+			run: function (e) {
+				self.showCrosshair();
+				return true;
+			}
+		}),
 
 		new Action({
 			helpText: "Zoom in",
@@ -722,4 +741,12 @@ function Navigator()
 		}
 		return false;
 	};
+	
+	this.handleKeyUp = function( e ) {
+		if( e.keyCode == 17 ) {
+			self.hideCrosshair();
+		}
+		
+		return true;
+	}
 }
