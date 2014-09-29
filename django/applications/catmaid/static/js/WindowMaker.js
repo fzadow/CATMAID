@@ -2745,6 +2745,44 @@ var WindowMaker = new function()
     return container;
   };
 
+  var createMessagesWindow = function()
+  {
+    var win = new CMWWindow( "Messages" );
+    var content = win.getFrame();
+    content.style.backgroundColor = '#FFF';
+
+    var container = createContainer( "messages_widget" );
+    content.appendChild( container );
+
+    container.innerHTML =
+    	'<table class="display" id="msgtable">' +
+	        '<thead>' +
+	        '<tr>' +
+	            '<th>title</th>' +
+	            '<th>text</th>' +
+	            '<th>action</th>' +
+	            '<th>read</th>' +
+	        '</tr>' +
+	        '</thead>' +
+	        '<tbody>' +
+	        '<tr>' +
+	            '<th>title</th>' +
+	            '<th>text</th>' +
+	            '<th>action</th>' +
+	            '<th>read</th>' +
+	        '</tr>' +
+	        '</tbody>' +
+	    '</table>';
+
+    addListener(win, container);
+
+    addLogic(win);
+
+    MessagesTable.init();
+
+    return win;
+  };
+
   var createKeyboardShortcutsWindow = function()
   {
     var win = new CMWWindow( "Keyboard Shortcuts" );
@@ -3137,6 +3175,7 @@ var WindowMaker = new function()
   };
   
   var creators = {
+    "messages": createMessagesWindow,
     "keyboard-shortcuts": createKeyboardShortcutsWindow,
     "search": createSearchWindow,
     "3d-view": create3dWindow,
