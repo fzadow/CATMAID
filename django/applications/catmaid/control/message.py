@@ -53,6 +53,25 @@ def list_messages(request, project_id=None):
 
     return HttpResponse(json.dumps(makeJSON_legacy_list(messages)))
 
+@login_required
+def list_messages_ajax(request):
+    print 'ajax-msg'
+    messages = Message.objects.filter(
+        user = request.user )\
+    .order_by('-time')
+
+    response = {'iTotalRecords': messages.count(), 'iTotalDisplayRecords': messages.count(), 'aaData': []}
+    for message in messages:
+        response['aaData'] += [[
+            message.title,
+            message.text,
+            message.action,
+            message.read
+        ]]
+    
+    return HttpResponse(json.dumps(response))
+    
+
 
 @login_required
 def read_message(request, project_id=None):
