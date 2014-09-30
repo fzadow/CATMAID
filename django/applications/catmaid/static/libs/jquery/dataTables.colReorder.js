@@ -145,73 +145,6 @@ $.fn.dataTableExt.oApi.fnColReorder = function ( oSettings, iFrom, iTo )
 		return;
 	}
 
-	/* Constrain the target column for tree-like complex headers */
-	var colDepth, treeSlice = [], origTo = iTo;
-	/* Find the depth of this column's header in the header tree */
-	for ( colDepth=oSettings.aoHeader.length-1 ; colDepth >= 0 ; colDepth-- )
-	{
-		if ( !oSettings.aoHeader[colDepth][iFrom].unique )
-		{
-			break;
-		}
-	}
-
-	colDepth++;
-
-	if ( colDepth > 0 ) /* This column can only be moved within its parent header */
-	{
-		for ( i=0, iLen=oSettings.aoHeader[colDepth-1].length ; i<iLen ; i++ )
-		{
-			for ( j=0, jLen=oSettings.aoHeader[colDepth-1][i].cell.colSpan ; j<jLen ; j++ )
-			{
-				treeSlice.push( i );
-			}
-			i += j - 1;
-		}
-
-		if ( treeSlice[iFrom] !== treeSlice[iTo] )
-		{
-			/* Move the target column towards the original column until it is a valid sibling
-			 * column
-			 */
-			for ( j = iTo > iFrom ? -1 : 1 ; treeSlice[iFrom] !== treeSlice[iTo] ; iTo += j );
-		}
-	}
-	else /* This column should not split columns grouped deeper in the tree */
-	{
-		var lastHeader = null;
-		for ( i=0, iLen=oSettings.aoHeader[colDepth].length ; i<iLen ; i++ )
-		{
-			if ( i<iLen ) lastHeader = oSettings.aoHeader[colDepth][i].cell;
-			j = 1;
-			while ( (i+1)<iLen && $( oSettings.aoHeader[colDepth][i+1].cell ).is( lastHeader ) )
-			{
-				j++;
-				i++;
-			}
-			treeSlice.push( j );
-		}
-
-		/* Generate an array of indices at the boundary of top-level header elements */
-		var treeSliceCols = treeSlice.map( function(a)
-			{ this.cumsum += a; return this.cumsum; },
-			{ cumsum: iTo < iFrom ? 0 : -1 } );
-		treeSliceCols.unshift( 0 );
-
-		bestCol = Infinity;
-
-		/* Find the nearest valid insertion column to the target column */
-		$.each( treeSliceCols, function ()
-			{
-				if ( Math.abs( iTo - this ) < Math.abs( iTo - bestCol ) )
-				{
-					bestCol = this;
-				}
-			} );
-
-		iTo = bestCol;
-	}
-
 	/*
 	 * Calculate the new column array index, so we have a mapping between the old and new
 	 */
@@ -297,43 +230,21 @@ $.fn.dataTableExt.oApi.fnColReorder = function ( oSettings, iFrom, iTo )
 		 * before needs to take into account that there might not be an element to insert before,
 		 * in which case it will be null, and an appendChild should be used
 		 */
-		var iVisibleIndex = iFrom;
-		var iInsertBeforeIndex = iTo + ( iTo < iFrom ? 0 : 1);
+		var iVisibleIndex = this.oApi._fnColumnIndexToVisible( oSettings, iFrom );
+		var iInsertBeforeIndex = null;
+
+		i = iTo < iFrom ? iTo : iTo + 1;
+		while ( iInsertBeforeIndex === null && i < iCols )
+		{
+			iInsertBeforeIndex = this.oApi._fnColumnIndexToVisible( oSettings, i );
+			i++;
+		}
 
 		/* Header */
 		nTrs = oSettings.nTHead.getElementsByTagName('tr');
 		for ( i=0, iLen=nTrs.length ; i<iLen ; i++ )
 		{
-			/* Only switch elements if the from column has a header element in this row */
-			if ( $(oSettings.aoHeader[i][iFrom].cell.parentElement).is( nTrs[i] ) )
-			{
-				var headerRowFrom = $( nTrs[i].childNodes ).index( oSettings.aoHeader[i][iFrom].cell );
-				var headerRowTo = iInsertBeforeIndex;
-
-				if ( headerRowTo !== null )
-				{
-					/* If the target column does not have an element in this header row, insert
-					 * before the next available column having an element in this row.
-					 */
-					while ( headerRowTo < oSettings.aoHeader[i].length &&
-							!$( oSettings.aoHeader[i][headerRowTo].cell.parentElement ).is( nTrs[i] ) )
-					{
-						headerRowTo++;
-					}
-
-					/* If the end of the row has been reached, append the header */
-					if ( headerRowTo >= oSettings.aoHeader[i].length )
-					{
-						headerRowTo = null;
-					}
-					else
-					{
-						headerRowTo = $(nTrs[i].childNodes).index(oSettings.aoHeader[i][headerRowTo].cell);
-					}
-				}
-
-				fnDomSwitch( nTrs[i], headerRowFrom, headerRowTo );
-			}
+			fnDomSwitch( nTrs[i], iVisibleIndex, iInsertBeforeIndex );
 		}
 
 		/* Footer */

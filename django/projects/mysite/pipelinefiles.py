@@ -19,7 +19,7 @@ PIPELINE_CSS = {
     'libraries': {
         'source_filenames': (
             'libs/jquery/themes/smoothness/jquery-ui.css',
-            'libs/jquery/datatable/css/demo_table.css',
+            'libs/jquery/datatable/css/jquery.dataTables.css',
             'libs/jquery/datatable/extras/ColReorder/css/dataTables.colReorder.css',
             'libs/jquery/jquery.growl.css',
             'libs/jquery/jquery-ui.combobox.css',
