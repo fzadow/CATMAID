@@ -742,3 +742,7 @@ span.message-icon {
   font-size: 15px;
   color: #00C;
 }
+
+.nobr {
+  white-space: nowrap;
+}

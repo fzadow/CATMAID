@@ -2762,6 +2762,8 @@ var WindowMaker = new function()
 	            '<th>text</th>' +
 	            '<th>action</th>' +
 	            '<th>read</th>' +
+	            '<th>time</th>' +
+	            '<th>id</th>' +
 	        '</tr>' +
 	        '</thead>' +
 	        '<tbody>' +
@@ -2770,6 +2772,8 @@ var WindowMaker = new function()
 	            '<th>text</th>' +
 	            '<th>action</th>' +
 	            '<th>read</th>' +
+	            '<th>time</th>' +
+	            '<th>id</th>' +
 	        '</tr>' +
 	        '</tbody>' +
 	    '</table>';

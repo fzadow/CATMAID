@@ -54,7 +54,9 @@ var MessagesTable = new function()
 								"visible" : false
 							}, {
 								"sortable" : false,
-								"visible" : true
+								"visible" : true,
+								"width" : "1%",
+								"className" : "nobr"
 							}, {
 								"visible" : false
 							}
