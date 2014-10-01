@@ -305,7 +305,7 @@ table.dataTable td {
   font-weight: normal;
 }
 .dataTables_wrapper .ui-toolbar {
-  padding: 8px;
+  padding-left: 8px;
 }
 .dataTables_wrapper:after {
   visibility: hidden;
