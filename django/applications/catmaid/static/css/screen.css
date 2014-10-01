@@ -684,7 +684,6 @@ div#classification_graph_object img.roiimage {
   font-style:italic;
 }
 
-
 .node circle {
   fill: #fff;
   stroke: steelblue;
@@ -736,4 +735,10 @@ a.neuron-selection-link:hover {
 
 .vertical-table-header div {
   position: absolute;
+}
+  
+/* read/unread icon in message table */
+span.message-icon {
+  font-size: 15px;
+  color: #00C;
 }
