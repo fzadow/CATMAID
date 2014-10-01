@@ -31,7 +31,7 @@ var MessagesTable = new function()
 					"serverSide": true,
 					"jQueryUI": true,
 					"ajax" : {
-						"url" : django_url + '/messages/listajax',
+						"url" : django_url + 'messages/listajax',
 						"type" : "POST"
 					},
 					"columns" : [

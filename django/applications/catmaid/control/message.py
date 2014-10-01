@@ -2,6 +2,7 @@ import json
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from catmaid.models import Message, ChangeRequest
 from catmaid.control.common import my_render_to_response, makeJSON_legacy_list
@@ -55,22 +56,35 @@ def list_messages(request, project_id=None):
 
 @login_required
 def list_messages_ajax(request):
-    print 'ajax-msg'
-    messages = Message.objects.filter(
-        user = request.user )\
-    .order_by('-time')
+    display_start = int(request.POST.get('start', 0))
+    display_length = int(request.POST.get('length', -1))
 
-    response = {'iTotalRecords': messages.count(), 'iTotalDisplayRecords': messages.count(), 'aaData': []}
-    for message in messages:
+    if display_length < 0:
+        display_length = 2000
+
+    messages_query = Message.objects.filter( user = request.user ).order_by('-time')
+    count_total = messages_query.count()
+
+    # filter for given search term in title and text
+    search_filter = request.POST.get('search[value]')
+    if( search_filter ):
+        print "filtering: " , search_filter
+        messages_query = messages_query.filter( Q( title__iregex=search_filter ) | Q( text__iregex=search_filter) )
+
+    result = list(messages_query[display_start:display_start + display_length])
+
+    response = {'iTotalRecords': count_total, 'iTotalDisplayRecords': messages_query.count(), 'aaData': []}
+    for message in result:
         response['aaData'] += [[
             message.title,
             message.text,
             message.action,
-            message.read
+            message.read,
+            message.time.strftime('%Y-%m-%d %H:%M'),
+            message.id
         ]]
     
     return HttpResponse(json.dumps(response))
-    
 
 
 @login_required
