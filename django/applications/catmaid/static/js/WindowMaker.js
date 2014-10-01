@@ -2755,7 +2755,7 @@ var WindowMaker = new function()
     content.appendChild( container );
 
     container.innerHTML =
-    	'<table class="display" id="msgtable">' +
+    	'<table class="hover compact order-column row-border" id="msgtable">' +
 	        '<thead>' +
 	        '<tr>' +
 	            '<th>title</th>' +
