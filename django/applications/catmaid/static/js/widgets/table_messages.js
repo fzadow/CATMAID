@@ -3,80 +3,99 @@ var MessagesTable = new function()
 {
 	this.messagesTable = null;
 	var self = this;
-	
 
-    var possibleLengths = [25, 100, 500, 2000, -1];
-    var possibleLengthsLabels = possibleLengths.map(
-        function (n) { return (n === -1) ? "All" : n.toString(); });	
-	
+	var possibleLengths = [25, 100, 500, 2000, -1];
+	var possibleLengthsLabels = possibleLengths.map(
+		function (n) { return (n === -1) ? "All" : n.toString(); });	
+
 	this.init = function() {
 		var tableid = '#msgtable';
-		self.messagesTable = $(tableid).dataTable(
+
+		function format( rowdata ) {
+			return '<i>' + rowdata[1] + '</i>';
+		}
+
+		self.messagesTable = $(tableid).DataTable(
 				{
-	                // http://www.datatables.net/usage/options
-	                "bDestroy": true,
-	                "sDom": '<"H"lr>t<"F"ip>',
-	                // default: <"H"lfr>t<"F"ip>
-	                "bProcessing": true,
-	                "bServerSide": true,
-	                "bAutoWidth": false,
-	                "iDisplayLength": possibleLengths[0],
-	                "sAjaxSource": django_url + '/messages/listajax',
-	                "fnServerData": function (sSource, aoData, fnCallback) {
-	                    aoData.push({
-	                        "name": "title",
-	                        "value" : $('#msgtable_title').val()
-	                    });
-	                    aoData.push({
-	                        "name": "text",
-	                        "value" : $('#msgtable_text').val()
-	                    });
-	                    aoData.push({
-	                        "name": "action",
-	                        "value" : $('#msgtable_action').val()
-	                    });
-	                    $.ajax({
-	                        "dataType": 'json',
-	                        "cache": false,
-	                        "type": "POST",
-	                        "url": sSource,
-	                        "data": aoData,
-	                        "success": fnCallback
-	                    });
-	                },
-	                "aLengthMenu": [
-	                    possibleLengths,
-	                    possibleLengthsLabels
-	                ],
-	                "bJQueryUI": true,
-	                "aaSorting": [[ 2, "desc" ]],
-	                "aoColumns": [
-					  { // title
-					      "bSearchable": true,
-					      "bSortable": true
-					  },
-					  { // text
-					      "bSearchable": true,
-					      "bSortable": true
-					  },
-					  { // action
-					      "bSearchable": true,
-					      "bSortable": true
-					  },
-					  { // read
-					      "sClass": "center",
-					      "bSearchable": false,
-					      "bSortable": false
-					  }
-					 ],
-					 "aoColumnDefs": [
-									     {
-									    	 "fnRender" : function( oObj ) {
-									    		 return '<b>' + oObj.aData[0] + '</b><br>' + oObj.aData[1];
-									    	 },
-									    	 "aTargets": [ 0 ]
-									     }
-									 ]
+					"ordering": false,
+					"dom": '<"H"lrf>t<"F"ip>',
+					"lengthMenu" : [
+							possibleLengths,
+							possibleLengthsLabels
+					],
+					"pageLength": possibleLengths[0],
+					"autoWidth": false,
+					"searching": true,
+					"stateSave": true,
+					"processing": true,
+					"serverSide": true,
+					"jQueryUI": true,
+					"ajax" : {
+						"url" : django_url + '/messages/listajax',
+						"type" : "POST"
+					},
+					"columns" : [
+							{
+								"name" : "Title",
+								"searchable" : true,
+								"sortable" : false
+							}, {
+								"name" : "Content",
+								"searchable" : true,
+								"visible" : false
+							}, {
+								"name" : "Action",
+								"searchable" : true,
+								"sortable" : false,
+								"visible" : false
+							}, {
+								"name" : "Read",
+								"searchable" : false,
+								"visible" : false
+							}, {
+								"sortable" : false,
+								"visible" : true
+							}, {
+								"visible" : false
+							}
+					],
+					"pagingType": "simple_numbers",
+					"createdRow": function( row, data, index ) {
+						if( data[3] == false ) {
+							$(row).addClass('highlight');
+							$('td', row).eq(0).prepend('<span class="message-icon">●</span> ');
+						}
+						else {
+							$('td', row).eq(0).prepend('<span class="message-icon">○</span> ');
+						}
+					}
 				});
+
+		
+		// Add event listener for opening and closing details
+		$(tableid + ' tbody').on('click', 'td', function () {
+			var tr = $(this).closest('tr');
+			var row = self.messagesTable.row( tr );
+
+			// make read if unread
+			if( row.data()[3] == false ) {
+				requestQueue.register( django_url + 'messages/mark_read?id=' + row.data()[5], 'GET', undefined, function( status, data, text ) {
+					row.invalidate().draw();
+				} );
+			}
+
+			if( row.data()[1] !== "" ) { // if message has a "body"	
+				if ( row.child.isShown() ) {
+					// This row is already open - close it
+					row.child.hide();
+					tr.removeClass('shown');
+				}
+				else {
+					// Open this row
+					row.child( format(row.data()) ).show();
+					tr.addClass('shown');
+				}
+			}
+		} );
 	}
 } 
