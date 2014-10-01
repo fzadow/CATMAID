@@ -2755,7 +2755,8 @@ var WindowMaker = new function()
     content.appendChild( container );
 
     container.innerHTML =
-    	'<table class="hover compact order-column row-border" id="msgtable">' +
+        '<label><input type="checkbox" id="readfilter"> show unread messages only<label>' +
+        '<table class="hover compact order-column row-border" id="msgtable">' +
 	        '<thead>' +
 	        '<tr>' +
 	            '<th>title</th>' +

@@ -65,6 +65,13 @@ def list_messages_ajax(request):
     messages_query = Message.objects.filter( user = request.user ).order_by('-time')
     count_total = messages_query.count()
 
+    # filter for unread messages
+    read_filter = request.POST.get('columns[3][search][value]')
+    print 'read_filter', read_filter
+    if( read_filter == 'true'):
+        print 'ok'
+        messages_query = messages_query.filter( read=False )
+
     # filter for given search term in title and text
     search_filter = request.POST.get('search[value]')
     if( search_filter ):
@@ -83,7 +90,7 @@ def list_messages_ajax(request):
             message.time.strftime('%Y-%m-%d %H:%M'),
             message.id
         ]]
-    
+
     return HttpResponse(json.dumps(response))
 
 

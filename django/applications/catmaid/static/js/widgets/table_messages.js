@@ -73,6 +73,13 @@ var MessagesTable = new function()
 					}
 				});
 
+		// Event listener for filter checkbox
+		$('#readfilter').on("click", function(e) {
+			self.messagesTable.column(3)
+				.search( $(this).is(':checked') )
+				.draw();
+		} );
+
 		
 		// Add event listener for opening and closing details
 		$(tableid + ' tbody').on('click', 'td', function () {
