@@ -2785,6 +2785,14 @@ var WindowMaker = new function()
 
     MessagesTable.init();
 
+    // make window 600 px wide if it is wider
+    if( win.getParent().getRightChild !== undefined ) {
+	    var windowWidth = win.getParent().getRightChild().getWidth();
+	    if ( windowWidth > 600 ) {
+	    	win.getParent().changeWidth( windowWidth - 600 );
+	    }
+    }
+
     return win;
   };
 
