@@ -53,6 +53,12 @@ table.dataTable tbody td {
 table.dataTable tbody tr.highlight td {
   font-weight: bold;
 }
+table.dataTable tbody tr span.message-icon:before {
+  content: '○';
+}
+table.dataTable tbody tr.highlight span.message-icon:before {
+  content: '●';
+}
 table.dataTable.row-border tbody th,
 table.dataTable.row-border tbody td {
   border-top: 1px solid #dddddd;

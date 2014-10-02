@@ -69,13 +69,10 @@ var MessagesTable = new function()
 					],
 					"pagingType": "simple_numbers",
 					"createdRow": function( row, data, index ) {
-						if( data[3] == false ) {
+						if( data[3] == false )
 							$(row).addClass('highlight');
-							$('td', row).eq(0).prepend('<span class="message-icon">●</span> ');
-						}
-						else {
-							$('td', row).eq(0).prepend('<span class="message-icon">○</span> ');
-						}
+
+						$('td', row).eq(0).prepend('<span class="message-icon"></span> ');
 					}
 				});
 
