@@ -92,7 +92,7 @@ var MessagesTable = new function()
 			// make read if unread
 			if( row.data()[3] == false ) {
 				requestQueue.register( django_url + 'messages/mark_read?id=' + row.data()[5], 'GET', undefined, function( status, data, text ) {
-					row.invalidate().draw();
+					tr.removeClass('highlight');
 				} );
 			}
 
