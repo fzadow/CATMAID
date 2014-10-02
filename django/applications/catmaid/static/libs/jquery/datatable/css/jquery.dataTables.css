@@ -471,3 +471,14 @@ table.dataTable td {
     margin-top: 0.5em;
   }
 }
+
+tr.shown td {
+	background-color: #ff7;
+}
+tr.shown + tr td {
+	background-color: #ffc;
+	border-bottom: 2px solid #ff7;
+}
+tr.shown + tr p {
+	margin: 1em;
+}

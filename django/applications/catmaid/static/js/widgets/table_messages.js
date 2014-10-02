@@ -12,7 +12,13 @@ var MessagesTable = new function()
 		var tableid = '#msgtable';
 
 		function format( rowdata ) {
-			return '<i>' + rowdata[1] + '</i>';
+			var out = '<p>' + rowdata[1] + '</p>';
+			
+			// download action associated?
+			if( rowdata[2] ) {
+				out += '<p><a target="_blank" href="/' + rowdata[2] + '"><span class="ui-icon ui-icon-arrowthickstop-1-s">asd</span>' + rowdata[2].replace(/.*\/(.*)\/?/, "$1") + '</a></p>';
+			}
+			return out;
 		}
 
 		self.messagesTable = $(tableid).DataTable(
