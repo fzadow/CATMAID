@@ -72,6 +72,9 @@ var MessagesTable = new function()
 						if( data[3] == false )
 							$(row).addClass('highlight');
 
+						if( data[1] !== "" )
+							$(row).addClass('hasbody');
+
 						$('td', row).eq(0).prepend('<span class="message-icon"></span> ');
 					}
 				});
