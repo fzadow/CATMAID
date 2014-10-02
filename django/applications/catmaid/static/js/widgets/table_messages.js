@@ -93,9 +93,20 @@ var MessagesTable = new function()
 			var row = self.messagesTable.row( tr );
 
 			// make read if unread
-			if( row.data()[3] == false ) {
-				requestQueue.register( django_url + 'messages/mark_read?id=' + row.data()[5], 'GET', undefined, function( status, data, text ) {
-					tr.removeClass('highlight');
+			if( tr.hasClass('highlight') ) {
+				requestQueue.register( django_url + 'messages/'+row.data()[5]+'/read', 'POST', undefined, function( status, data, text ) {
+					if( JSON.parse(data).success ) {
+						tr.removeClass('highlight');
+					}
+				} );
+			}
+
+			// make unread if (read and) clicked on read/unread icon
+			if( ! tr.hasClass('highlight') && e.originalEvent.toElement.nodeName == 'SPAN' ) {
+				requestQueue.register( django_url + 'messages/'+row.data()[5]+'/unread', 'POST', undefined, function( status, data, text ) {
+					if( JSON.parse(data).success ) {
+						tr.addClass('highlight');
+					}
 				} );
 			}
 
