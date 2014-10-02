@@ -87,8 +87,8 @@ var MessagesTable = new function()
 		} );
 
 		
-		// Add event listener for opening and closing details
-		$(tableid + ' tbody').on('click', 'td', function () {
+		// Event listener for reading message / opening/closing details
+		$(tableid + ' tbody').on('click', 'td', function (e) {
 			var tr = $(this).closest('tr');
 			var row = self.messagesTable.row( tr );
 
@@ -108,16 +108,15 @@ var MessagesTable = new function()
 						tr.addClass('highlight');
 					}
 				} );
+				return; // to prevent message from opening
 			}
 
 			if( row.data()[1] !== "" ) { // if message has a "body"	
 				if ( row.child.isShown() ) {
-					// This row is already open - close it
 					row.child.hide();
 					tr.removeClass('shown');
 				}
 				else {
-					// Open this row
 					row.child( format(row.data()) ).show();
 					tr.addClass('shown');
 				}
